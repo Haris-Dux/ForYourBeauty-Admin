@@ -25,10 +25,10 @@ const CreateProduct = () => {
   };
 
   // Map categories to objects
-//   const categoriesObjects = categories.map((category, index) => ({
-//     id: index + 1,
-//     name: category,
-//   }));
+  //   const categoriesObjects = categories.map((category, index) => ({
+  //     id: index + 1,
+  //     name: category,
+  //   }));
 
   const { createLoading } = useSelector((state) => state.product);
 
@@ -40,7 +40,7 @@ const CreateProduct = () => {
     subCategory: "",
     quantity: "",
     description: "",
-    image: "",
+    file: null,
     latest: false,
   });
 
@@ -58,17 +58,18 @@ const CreateProduct = () => {
     setFormdata({ ...formdata, subCategory: selectedSubCategory });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setFileToBase(file);
-  };
-
-  const setFileToBase = (file) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setFormdata({ ...formdata, image: reader.result });
-    };
+  const handleChange = (e, fieldName) => {
+    if (e.target.type === "file") {
+      setFormdata({
+        ...formdata,
+        [fieldName]: e.target.files[0],
+      });
+    } else {
+      setFormdata({
+        ...formdata,
+        [fieldName]: e.target.value,
+      });
+    }
   };
 
   const handleCheckChange = (event) => {
@@ -80,16 +81,32 @@ const CreateProduct = () => {
       [name]: newValue,
     });
   };
+  console.log("FormData object:", formdata.file);
 
   // HANDLE SUBMIT
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formdata.image) {
-      console.log("formdata", formdata);
-      dispatch(createProductAsync(formdata)).then(() => {
-        navigate("/admin/all_product");
-        window.scroll(0, 0);
-      });
+
+    if (formdata?.file) {
+      console.log("Formdata before FormData creation:", formdata);
+
+      const formData = new FormData();
+      formData.append("file", formdata.file);
+      formData.append("name", formdata.name);
+      formData.append("price", formdata.price);
+      formData.append("sale_price", formdata.sale_price);
+      formData.append("category", formdata.category);
+      formData.append("subCategory", formdata.subCategory);
+      formData.append("quantity", formdata.quantity);
+      formData.append("description", formdata.description);
+      formData.append("latest", formdata.latest);
+
+      console.log("FormData object:", formData);
+
+      // dispatch(createProductAsync(formData)).then(() => {
+      //   navigate("/admin/all_product");
+      //   window.scroll(0, 0);
+      // });
     } else {
       toast.error("Upload product with image");
     }
@@ -291,7 +308,11 @@ const CreateProduct = () => {
                       htmlFor="dropzone-file"
                     >
                       <img
-                        src={formdata?.image}
+                        src={
+                          formdata.file
+                            ? URL.createObjectURL(formdata.file)
+                            : ""
+                        }
                         alt="Selected"
                         className="h-full"
                       />
@@ -333,10 +354,7 @@ const CreateProduct = () => {
                         className="hidden"
                         id="dropzone-file"
                         type="file"
-                        // id="file"
-                        onChange={handleImageChange}
-                        accept="image/*"
-                        ref={fileInputRef}
+                        onChange={(e) => handleChange(e, "file")}
                       />
                     </label>
                   </div>

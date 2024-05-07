@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import "./Auth.css";
 import { sendOtpAsync } from "../features/authSlice";
+import "./Auth.css";
 
 const SendOtp = () => {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ const SendOtp = () => {
     email: "",
   });
 
-  const { user, isLoading } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.auth);
 
   // useEffect(() => {
   //   if (user && user?.login) {
@@ -22,7 +22,12 @@ const SendOtp = () => {
   // HANDLE SUBMIT
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(sendOtpAsync(formData));
+    dispatch(sendOtpAsync(formData)).then(() => {
+      navigate("/verifyOtp");
+      setFormData({
+        email: "",
+      });
+    });
   };
 
   return (

@@ -14,21 +14,23 @@ const initialState = {
   message: "",
 };
 
-
 //API URL
-const getProductUrl = "http://localhost:4000/api/products/getProducts";
-const createProductUrl = "http://localhost:4000/api/products/addProduct";
-const updateProductUrl = "http://localhost:4000/api/products/updateProduct";
-const deleteProductUrl = "http://localhost:4000/api/products/deleteProduct";
-const getLatestProductUrl = "http://localhost:4000/api/products/getLatestPRoducts";
-
+// const getProductUrl = "http://localhost:4000/api/products/getProducts";
+const createProductUrl = "http://localhost:8000/api/products/addProduct";
+// const updateProductUrl = "http://localhost:4000/api/products/updateProduct";
+// const deleteProductUrl = "http://localhost:4000/api/products/deleteProduct";
+// const getLatestProductUrl = "http://localhost:4000/api/products/getLatestPRoducts";
 
 //CREATE ASYNC THUNK
 export const createProductAsync = createAsyncThunk(
   "Shop/create",
-  async (formData) => {
+  async (formdata) => {
     try {
-      const response = await axios.post(createProductUrl, formData);
+      const response = await axios.post(createProductUrl, formdata, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       toast.success(response.data.message);
       console.log(response.data);
       return response.data;
@@ -60,7 +62,7 @@ const productSlice = createSlice({
         state.createLoading = false;
         state.isError = true;
         state.message = action.payload;
-      })
+      });
 
     // .addCase(getProductAsync.pending, (state, action) => {
     //   state.isLoading = true;

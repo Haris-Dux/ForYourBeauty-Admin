@@ -80,7 +80,7 @@ const AllProducts = () => {
         <>
           <section className="bg-[#E5E5E5] dark:bg-gray-900 min-h-screen py-8 sm:py-10 mx-auto max-w-screen-xl px-4 lg:px-10">
             {/* ------------ FIRST STATS BAR ------------*/}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:grid-cols-2 xl:grid-cols-4 lg:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:grid-cols-2 xl:grid-cols-4 lg:gap-4">
               {/* FIRST BOX */}
               <div className="px-5 h-36 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 flex justify-between items-center">
                 <div className="img">

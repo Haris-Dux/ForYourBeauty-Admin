@@ -1,40 +1,54 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUserAsync } from "../features/authSlice";
+import { resetPassAsync } from "../features/authSlice";
 import "./Auth.css";
 
-const Login = () => {
+const ResetPassword = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const id = useSelector((state) => state.auth.userId);
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
     password: "",
+    confirmPassword: "",
   });
 
-  const { user, isLoading } = useSelector((state) => state.auth);
+  const { password, confirmPassword } = formData;
 
-  useEffect(() => {
-    if (user && user?.login) {
-      navigate("/admin");
+  // HANDLE SUBMIT
+  const handleSubmit = async (e) => {
+    const resetPassword = password;
+    e.preventDefault();
+    if (password === confirmPassword) {
+      try {
+        await dispatch(resetPassAsync({ id, resetPassword }));
+        navigate("/");
+        setFormData({
+          password: "",
+          confirmPassword: "",
+        });
+      } catch (error) {
+        console.error("Error resetting password:", error);
+      }
+    } else {
+      console.error("Passwords do not match");
     }
-  }, [user]);
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // HANDLE SUBMIT
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(loginUserAsync(formData)).then(() => {
-      setFormData({
-        email: "",
-        password: "",
-      });
-    });
-  };
+  const { isLoading } = useSelector((state) => state.auth);
+
+  // useEffect(() => {
+  //   if (user && user?.login) {
+  //     navigate("/admin");
+  //   }
+  // }, []);
 
   return (
     <>
@@ -46,42 +60,21 @@ const Login = () => {
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 ">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                Sign in to your account
+                Reset Password
               </h1>
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-                {/* EMAIL */}
                 <div>
                   <label
                     className="block mb-2 text-sm font-medium text-gray-900"
                     htmlFor="email"
                   >
-                    Your email
-                  </label>
-                  <input
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    id="email"
-                    type="email"
-                    placeholder="name@company.com"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                {/* PASSWORD */}
-                <div>
-                  <label
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                    htmlFor="password"
-                  >
-                    Password
+                    Password:
                   </label>
                   <input
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     type={showPassword ? "text" : "password"}
                     id="password"
+                    name="password"
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) =>
@@ -90,41 +83,53 @@ const Login = () => {
                     required
                   />
                 </div>
-
-                {/* TOGGLE PASSWORD */}
-                <div className="flex items-center justify-between">
-                  {/* TOGGLE PASSWORD VISIBILITY */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-start">
-                      <div className="flex items-center h-5">
-                        <input
-                          aria-describedby="remember"
-                          className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-0"
-                          id="remember"
-                          type="checkbox"
-                          onChange={togglePasswordVisibility}
-                        />
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label
-                          className="text-gray-700 select-none cursor-pointer"
-                          htmlFor="remember"
-                        >
-                          show password
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Link
-                    className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
-                    to={"/sendOtp"}
+                <div>
+                  <label
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                    htmlFor="email"
                   >
-                    Forgot password?
-                  </Link>
+                    Confirm Password:
+                  </label>
+                  <input
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    type={showPassword ? "text" : "password"}
+                    id="confirmpassword"
+                    name="confirmPassword"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
+                    required
+                  />
                 </div>
 
-                {/* BUTTON */}
+                {/* TOGGLE PASSWORD VISIBILITY */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-start">
+                    <div className="flex items-center h-5">
+                      <input
+                        aria-describedby="remember"
+                        className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-0 dark:bg-gray-700 dark:border-gray-600"
+                        id="remember"
+                        type="checkbox"
+                        onChange={togglePasswordVisibility}
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        className="text-gray-500 dark:text-gray-300 select-none cursor-pointer"
+                        htmlFor="remember"
+                      >
+                        show password
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -142,17 +147,8 @@ const Login = () => {
                       <path d="M526 1394q0 53-37.5 90.5t-90.5 37.5q-52 0-90-38t-38-90q0-53 37.5-90.5t90.5-37.5 90.5 37.5 37.5 90.5zm498 206q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-704-704q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm1202 498q0 52-38 90t-90 38q-53 0-90.5-37.5t-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-964-996q0 66-47 113t-113 47-113-47-47-113 47-113 113-47 113 47 47 113zm1170 498q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-640-704q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm530 206q0 93-66 158.5t-158 65.5q-93 0-158.5-65.5t-65.5-158.5q0-92 65.5-158t158.5-66q92 0 158 66t66 158z"></path>
                     </svg>
                   )}
-                  Sign in
+                  Send Opt
                 </button>
-                <p className="text-sm font-light text-gray-500">
-                  Don’t have an account yet?{" "}
-                  <Link
-                    to="/signup"
-                    className="font-medium text-primary-600 hover:underline"
-                  >
-                    Sign up
-                  </Link>
-                </p>
               </form>
             </div>
           </div>
@@ -162,4 +158,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

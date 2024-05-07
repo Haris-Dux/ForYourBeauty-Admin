@@ -1,5 +1,8 @@
 import { ProductsModel } from "../models/Products.Model.js";
-import { deleteImageFromFirebase, uploadImageToFirebase } from "../utils/Firebase.js";
+import {
+  deleteImageFromFirebase,
+  uploadImageToFirebase,
+} from "../utils/Firebase.js";
 import { setMongoose } from "../utils/Mongoose.js";
 
 export const addProduct = async (req, res, next) => {
@@ -14,15 +17,7 @@ export const addProduct = async (req, res, next) => {
       subCategory,
       latest,
     } = req.body;
-    if (
-      !name ||
-      !description ||
-      !price ||
-      !stock ||
-      !image ||
-      !category ||
-      !subCategory
-    )
+    if (!name || !description || !price || !stock || !category || !subCategory)
       throw new Error("Please provide all required fields");
     if (price <= 0 && stock <= 0) {
       throw new Error("Value must be greater then 0");
@@ -70,7 +65,7 @@ export const updateProduct = async (req, res, next) => {
     const product = await ProductsModel.findById(productId);
     if (!product) {
       throw new Error("Product not found");
-    };
+    }
     let updateQuery = {};
     if (name) {
       updateQuery = { ...updateQuery, name };
@@ -111,8 +106,8 @@ export const updateProduct = async (req, res, next) => {
         name: result.name,
         type: result.type,
       };
-      if(imageData.downloadURL && product.image.downloadURL){
-        await deleteImageFromFirebase(product.image.downloadURL)
+      if (imageData.downloadURL && product.image.downloadURL) {
+        await deleteImageFromFirebase(product.image.downloadURL);
       }
       updateQuery = { ...updateQuery, imageData };
     }
@@ -132,7 +127,7 @@ export const deleteProduct = async (req, res, next) => {
     const product = await ProductsModel.findById(productId);
     if (!product) {
       throw new Error("Product not found");
-    };
+    }
     await deleteImageFromFirebase(product.image.downloadURL);
     await ProductsModel.findByIdAndDelete({ _id: productId });
     return res.status(200).json({ message: "Deleted Succesfully" });
@@ -168,13 +163,11 @@ export const getProducts = async (req, res, next) => {
 
     const count = await ProductsModel.find({ latest: false }).countDocuments();
     setMongoose();
-    return res
-      .status(200)
-      .json({
-        products,
-        totalPages: Math.ceil(count / limit),
-        currentPage: page,
-      });
+    return res.status(200).json({
+      products,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

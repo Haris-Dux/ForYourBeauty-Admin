@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import "./Auth.css";
-import { sendOtpAsync } from "../features/authSlice";
+import { sendOtpAsync, verifyOtpAsync } from "../features/authSlice";
 
 const verifyOtp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { userId } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
-    email: "",
+    otp: "",
+    userId: userId,
   });
 
   const { user, isLoading } = useSelector((state) => state.auth);
@@ -19,10 +23,15 @@ const verifyOtp = () => {
     }
   }, []);
 
-  // HANDLE SUBMIT
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch();
+    console.log(formData);
+    dispatch(verifyOtpAsync(formData)).then(() => {
+      navigate("/reset");
+      setFormData({
+        otp: "",
+      });
+    });
   };
 
   return (
@@ -35,7 +44,7 @@ const verifyOtp = () => {
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 ">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                Forgot Password
+                OTP Verification
               </h1>
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                 <div>
@@ -43,16 +52,17 @@ const verifyOtp = () => {
                     className="block mb-2 text-sm font-medium text-gray-900"
                     htmlFor="email"
                   >
-                    Your email
+                    Enter OTP Code
                   </label>
                   <input
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    id="email"
-                    type="email"
-                    placeholder="name@company.com"
-                    value={formData.email}
+                    id="otp"
+                    name="otp"
+                    type="number"
+                    placeholder=""
+                    value={formData.otp}
                     onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
+                      setFormData({ ...formData, otp: e.target.value })
                     }
                     required
                   />
@@ -75,7 +85,7 @@ const verifyOtp = () => {
                       <path d="M526 1394q0 53-37.5 90.5t-90.5 37.5q-52 0-90-38t-38-90q0-53 37.5-90.5t90.5-37.5 90.5 37.5 37.5 90.5zm498 206q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-704-704q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm1202 498q0 52-38 90t-90 38q-53 0-90.5-37.5t-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-964-996q0 66-47 113t-113 47-113-47-47-113 47-113 113-47 113 47 47 113zm1170 498q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-640-704q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm530 206q0 93-66 158.5t-158 65.5q-93 0-158.5-65.5t-65.5-158.5q0-92 65.5-158t158.5-66q92 0 158 66t66 158z"></path>
                     </svg>
                   )}
-                  Send Opt
+                  Submit
                 </button>
               </form>
             </div>

@@ -6,6 +6,10 @@ import axios from "axios";
 const initialState = {
   user: null,
   isLoading: false,
+  userId: null,
+  forgetPasswordEmail: null,
+  resetPassword: null,
+  validateToken: null,
 };
 
 //API URL
@@ -13,8 +17,7 @@ const signupUrl = "http://localhost:8000/api/users/signup";
 const loginUrl = "http://localhost:8000/api/users/login";
 const logoutUrl = "http://localhost:8000/api/users/logout";
 const verifyOtpUrl = "http://localhost:8000/api/users/verifyOtp";
-const sendResetPasswordOTPUrl =
-  "http://localhost:8000/api/users/sendResetPasswordOTP";
+const sendResetPasswordOTPUrl = "http://localhost:8000/api/users/sendResetPasswordOTP";
 const updatePasswordUrl = "http://localhost:8000/api/users/updatePassword";
 const userSession = "http://localhost:8000/api/users/persistUserSession";
 
@@ -46,10 +49,57 @@ export const loginUserAsync = createAsyncThunk(
   }
 );
 
-// Logout
+// sendOtp
+export const sendOtpAsync = createAsyncThunk(
+  "user/serndOtp",
+  async (formData) => {
+    try {
+      const response = await axios.post(sendResetPasswordOTPUrl, formData);
+      toast.success(response.data.message);
+      return response.data;
+    } catch (error) {
+      toast.error(error.response.data.error);
+    }
+  }
+);
+
+// verifyOtp
+export const verifyOtpAsync = createAsyncThunk(
+  "user/verifyOtp",
+  async (formData) => {
+    try {
+      const response = await axios.post(verifyOtpUrl, formData);
+      toast.success(response.data.message);
+      return response.data;
+    } catch (error) {
+      toast.error(error.response.data.error);
+    }
+  }
+);
+
+// RESET ASYNC THUNK
+export const resetPassAsync = createAsyncThunk(
+  "user/reset",
+  async ({ id, resetPassword }) => {
+    try {
+      const response = await axios.post(updatePasswordUrl, {
+        id,
+        resetPassword,
+      });
+      toast.success(response.data.message);
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.log(error.response.data.error);
+      toast.error(error.response.data.error);
+    }
+  }
+);
+
+// Logout Function
 export const logoutUserAsync = createAsyncThunk("user/logout", async () => {
   try {
-    const response = await axios.post(logoutUrl);
+    const response = await axios.delete(logoutUrl);
     toast.success(response.data.message);
     return response.data;
   } catch (error) {
@@ -69,28 +119,6 @@ export const userSessionAsync = createAsyncThunk(
     }
   }
 );
-
-// sendOtp
-export const sendOtpAsync = createAsyncThunk("user/serndOtp", async (formData) => {
-    try {
-      const response = await axios.post(sendResetPasswordOTPUrl,formData);
-      toast.success(response.data.message);
-      return response.data;
-    } catch (error) {
-      toast.error(error.response.data.error);
-    }
-  });
-
-  // verifyOtp
-export const verifyOtpAsync = createAsyncThunk("user/verifyOtp", async (formData) => {
-    try {
-      const response = await axios.post(verifyOtpUrl,formData);
-      toast.success(response.data.message);
-      return response.data;
-    } catch (error) {
-      toast.error(error.response.data.error);
-    }
-  });
 
 const authSlice = createSlice({
   name: "authSlice",
@@ -113,6 +141,7 @@ const authSlice = createSlice({
       })
       .addCase(logoutUserAsync.fulfilled, (state, action) => {
         state.user = null;
+        state.isLoading = false;
       })
 
       // Login
@@ -133,6 +162,14 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
 
+      // FORGET PASSWORD ADD CASE
+      .addCase(sendOtpAsync.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(sendOtpAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.userId = action.payload.userId;
+      });
   },
 });
 

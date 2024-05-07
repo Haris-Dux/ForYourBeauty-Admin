@@ -1,37 +1,4 @@
 import { useSelector } from "react-redux";
-import { IoStar } from "react-icons/io5";
-import { IoTrashOutline } from "react-icons/io5";
-
-const data = [
-  {
-    name: "Suheer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Haris",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Umer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Suheer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-];
 
 const Reviews = () => {
   const { isLoading } = useSelector((state) => state.product);
@@ -67,7 +34,7 @@ const Reviews = () => {
         <>
           <section className="bg-[#E5E5E5] dark:bg-gray-900 py-8 sm:py-10 mx-auto min-h-screen max-w-screen-xl px-4 lg:px-8">
             <div className="bg-white py-8 antialiased dark:bg-gray-800 md:py-16 rounded-lg">
-              <div className="mx-auto px-6 2xl:px-0">
+              <div className="mx-auto px-6 2xl:px-6">
                 <div className="flex items-center gap-2">
                   <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
                     Reviews
@@ -137,7 +104,8 @@ const Reviews = () => {
                       className="text-sm font-medium leading-none text-gray-900 underline hover:no-underline dark:text-white"
                       href="#"
                     >
-                      {' '}645 Reviews{' '}
+                      {" "}
+                      645 Reviews{" "}
                     </a>
                   </div>
                 </div>
@@ -175,7 +143,7 @@ const Reviews = () => {
                         <div
                           className="h-1.5 rounded-full bg-yellow-300"
                           style={{
-                            width: '20%'
+                            width: "20%",
                           }}
                         />
                       </div>
@@ -183,10 +151,7 @@ const Reviews = () => {
                         className="w-8 shrink-0 text-right text-sm font-medium leading-none text-primary-700 hover:underline dark:text-primary-500 sm:w-auto sm:text-left"
                         href="#"
                       >
-                        239{' '}
-                        <span className="hidden sm:inline">
-                          reviews
-                        </span>
+                        239 <span className="hidden sm:inline">reviews</span>
                       </a>
                     </div>
                     <div className="flex items-center gap-2">
@@ -208,7 +173,7 @@ const Reviews = () => {
                         <div
                           className="h-1.5 rounded-full bg-yellow-300"
                           style={{
-                            width: '60%'
+                            width: "60%",
                           }}
                         />
                       </div>
@@ -216,10 +181,7 @@ const Reviews = () => {
                         className="w-8 shrink-0 text-right text-sm font-medium leading-none text-primary-700 hover:underline dark:text-primary-500 sm:w-auto sm:text-left"
                         href="#"
                       >
-                        432{' '}
-                        <span className="hidden sm:inline">
-                          reviews
-                        </span>
+                        432 <span className="hidden sm:inline">reviews</span>
                       </a>
                     </div>
                     <div className="flex items-center gap-2">
@@ -241,7 +203,7 @@ const Reviews = () => {
                         <div
                           className="h-1.5 rounded-full bg-yellow-300"
                           style={{
-                            width: '15%'
+                            width: "15%",
                           }}
                         />
                       </div>
@@ -249,10 +211,7 @@ const Reviews = () => {
                         className="w-8 shrink-0 text-right text-sm font-medium leading-none text-primary-700 hover:underline dark:text-primary-500 sm:w-auto sm:text-left"
                         href="#"
                       >
-                        53{' '}
-                        <span className="hidden sm:inline">
-                          reviews
-                        </span>
+                        53 <span className="hidden sm:inline">reviews</span>
                       </a>
                     </div>
                     <div className="flex items-center gap-2">
@@ -274,7 +233,7 @@ const Reviews = () => {
                         <div
                           className="h-1.5 rounded-full bg-yellow-300"
                           style={{
-                            width: '5%'
+                            width: "5%",
                           }}
                         />
                       </div>
@@ -282,10 +241,7 @@ const Reviews = () => {
                         className="w-8 shrink-0 text-right text-sm font-medium leading-none text-primary-700 hover:underline dark:text-primary-500 sm:w-auto sm:text-left"
                         href="#"
                       >
-                        32{' '}
-                        <span className="hidden sm:inline">
-                          reviews
-                        </span>
+                        32 <span className="hidden sm:inline">reviews</span>
                       </a>
                     </div>
                     <div className="flex items-center gap-2">
@@ -307,7 +263,7 @@ const Reviews = () => {
                         <div
                           className="h-1.5 rounded-full bg-yellow-300"
                           style={{
-                            width: '0%'
+                            width: "0%",
                           }}
                         />
                       </div>
@@ -315,10 +271,7 @@ const Reviews = () => {
                         className="w-8 shrink-0 text-right text-sm font-medium leading-none text-primary-700 hover:underline dark:text-primary-500 sm:w-auto sm:text-left"
                         href="#"
                       >
-                        13{' '}
-                        <span className="hidden sm:inline">
-                          reviews
-                        </span>
+                        13 <span className="hidden sm:inline">reviews</span>
                       </a>
                     </div>
                   </div>
@@ -414,7 +367,10 @@ const Reviews = () => {
                     </div>
                     <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
                       <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        My old IMAC was from 2013. This replacement was well needed. Very fast, and the colour matches my office set up perfectly. The display is out of this world and I’m very happy with this purchase.
+                        My old IMAC was from 2013. This replacement was well
+                        needed. Very fast, and the colour matches my office set
+                        up perfectly. The display is out of this world and I’m
+                        very happy with this purchase.
                       </p>
                       <div className="flex items-center gap-4">
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -432,7 +388,8 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-1"
                           >
-                            {' '}Yes: 3{' '}
+                            {" "}
+                            Yes: 3{" "}
                           </label>
                         </div>
                         <div className="flex items-center">
@@ -447,7 +404,7 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-2"
                           >
-                            No: 0{' '}
+                            No: 0{" "}
                           </label>
                         </div>
                       </div>
@@ -543,7 +500,9 @@ const Reviews = () => {
                     </div>
                     <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
                       <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        It’s fancy, amazing keyboard, matching accessories. Super fast, batteries last more than usual, everything runs perfect in this computer. Highly recommend!
+                        It’s fancy, amazing keyboard, matching accessories.
+                        Super fast, batteries last more than usual, everything
+                        runs perfect in this computer. Highly recommend!
                       </p>
                       <div className="flex gap-2">
                         <img
@@ -573,7 +532,8 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-3"
                           >
-                            {' '}Yes: 1{' '}
+                            {" "}
+                            Yes: 1{" "}
                           </label>
                         </div>
                         <div className="flex items-center">
@@ -588,7 +548,7 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-4"
                           >
-                            No: 0{' '}
+                            No: 0{" "}
                           </label>
                         </div>
                       </div>
@@ -684,7 +644,10 @@ const Reviews = () => {
                     </div>
                     <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
                       <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        My old IMAC was from 2013. This replacement was well needed. Very fast, and the colour matches my office set up perfectly. The display is out of this world and I’m very happy with this purchase.
+                        My old IMAC was from 2013. This replacement was well
+                        needed. Very fast, and the colour matches my office set
+                        up perfectly. The display is out of this world and I’m
+                        very happy with this purchase.
                       </p>
                       <div className="flex items-center gap-4">
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -702,7 +665,8 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-5"
                           >
-                            {' '}Yes: 0{' '}
+                            {" "}
+                            Yes: 0{" "}
                           </label>
                         </div>
                         <div className="flex items-center">
@@ -717,7 +681,7 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-6"
                           >
-                            No: 0{' '}
+                            No: 0{" "}
                           </label>
                         </div>
                       </div>
@@ -813,10 +777,19 @@ const Reviews = () => {
                     </div>
                     <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
                       <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        I have used earlier Mac computers in my university work for a number of years and found them easy to use.The iMac 2021 is no exception. It works straight out of the box giving superb definition from the HD screen.
+                        I have used earlier Mac computers in my university work
+                        for a number of years and found them easy to use.The
+                        iMac 2021 is no exception. It works straight out of the
+                        box giving superb definition from the HD screen.
                       </p>
                       <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Basic tools such as a browser (Safari) and a mail client are included in the system. Microsoft Office apps can be downloaded from the App Store though they may only work in read-only mode unless you take out a subscription. The instruction manual that comes with it is the size of a piece of toilet paper but the proper user guide is on-line.
+                        Basic tools such as a browser (Safari) and a mail client
+                        are included in the system. Microsoft Office apps can be
+                        downloaded from the App Store though they may only work
+                        in read-only mode unless you take out a subscription.
+                        The instruction manual that comes with it is the size of
+                        a piece of toilet paper but the proper user guide is
+                        on-line.
                       </p>
                       <div className="flex items-center gap-4">
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -834,7 +807,8 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-7"
                           >
-                            {' '}Yes: 1{' '}
+                            {" "}
+                            Yes: 1{" "}
                           </label>
                         </div>
                         <div className="flex items-center">
@@ -849,7 +823,7 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-8"
                           >
-                            No: 0{' '}
+                            No: 0{" "}
                           </label>
                         </div>
                       </div>
@@ -945,7 +919,12 @@ const Reviews = () => {
                     </div>
                     <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
                       <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        I replaced my 11 year old iMac with the new M1 Apple. I wanted to remain with Apple as my old one is still working perfectly and all Apple products are so reliable. Setting up was simple and fast and transferring everything from my previous iMac worked perfectly.
+                        I replaced my 11 year old iMac with the new M1 Apple. I
+                        wanted to remain with Apple as my old one is still
+                        working perfectly and all Apple products are so
+                        reliable. Setting up was simple and fast and
+                        transferring everything from my previous iMac worked
+                        perfectly.
                       </p>
                       <div className="flex items-center gap-4">
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -963,7 +942,8 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-9"
                           >
-                            {' '}Yes: 1{' '}
+                            {" "}
+                            Yes: 1{" "}
                           </label>
                         </div>
                         <div className="flex items-center">
@@ -978,7 +958,7 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             htmlFor="reviews-radio-10"
                           >
-                            No: 0{' '}
+                            No: 0{" "}
                           </label>
                         </div>
                       </div>
@@ -1012,7 +992,8 @@ const Reviews = () => {
                         className="font-medium text-primary-700 hover:underline dark:text-primary-500"
                         href="#"
                       >
-                        Apple iMac 24" All-In-One Computer, Apple M1, 8GB RAM, 256GB SSD
+                        Apple iMac 24" All-In-One Computer, Apple M1, 8GB RAM,
+                        256GB SSD
                       </a>
                     </div>
                     <button
@@ -1035,9 +1016,7 @@ const Reviews = () => {
                           strokeWidth="2"
                         />
                       </svg>
-                      <span className="sr-only">
-                        Close modal
-                      </span>
+                      <span className="sr-only">Close modal</span>
                     </button>
                   </div>
                   <form className="p-4 md:p-5">
@@ -1123,7 +1102,7 @@ const Reviews = () => {
                           rows="6"
                         />
                         <p className="ms-auto text-xs text-gray-500 dark:text-gray-400">
-                          Problems with the product or delivery?{' '}
+                          Problems with the product or delivery?{" "}
                           <a
                             className="text-primary-600 hover:underline dark:text-primary-500"
                             href="#"
@@ -1135,7 +1114,7 @@ const Reviews = () => {
                       </div>
                       <div className="col-span-2">
                         <p className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                          Add real photos of the product to help other customers{' '}
+                          Add real photos of the product to help other customers{" "}
                           <span className="text-gray-500 dark:text-gray-400">
                             (Optional)
                           </span>
@@ -1164,8 +1143,8 @@ const Reviews = () => {
                               <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                                 <span className="font-semibold">
                                   Click to upload
-                                </span>
-                                {' '}or drag and drop
+                                </span>{" "}
+                                or drag and drop
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 SVG, PNG, JPG or GIF (MAX. 800x400px)
@@ -1191,7 +1170,7 @@ const Reviews = () => {
                             className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400"
                             htmlFor="review-checkbox"
                           >
-                            By publishing this review you agree with the{' '}
+                            By publishing this review you agree with the{" "}
                             <a
                               className="text-primary-600 hover:underline dark:text-primary-500"
                               href="#"

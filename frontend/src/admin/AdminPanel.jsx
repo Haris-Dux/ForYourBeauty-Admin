@@ -3,8 +3,6 @@ import { Moon, Sun } from "lucide-react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUserAsync } from "../features/authSlice";
-import { FaStore } from "react-icons/fa";
-import { MdAddBusiness } from "react-icons/md";
 // import { logoutUserAsync, reset } from "../features/authSlice";
 // import { getProductAsync } from "../features/productSlice";
 
@@ -33,12 +31,13 @@ const AdminBody = () => {
       top: 0,
       behavior: "smooth",
     });
-  }
+  };
 
   const handleLogout = async () => {
-    if (user && user.token) {
-      dispatch(logoutUserAsync());
-      navigate("/login");
+    if (user) {
+      dispatch(logoutUserAsync()).then(() => {
+        navigate("/login");
+      });
     } else {
       navigate("/login");
     }
@@ -160,32 +159,32 @@ const AdminBody = () => {
                     onClick={toggleMenu}
                     ref={menuButtonRef}
                   >
-                    {user?.name[0]}
+                    {user?.user?.name[0]}
                   </button>
                 </div>
+
                 <div
                   aria-labelledby="menu-button"
                   aria-orientation="vertical"
-                  className={`${isMenuOpen ? "" : "hidden"
-                    } absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none`}
+                  className={`${
+                    isMenuOpen ? "" : "hidden"
+                  } absolute right-0 z-10 mt-2 w-56 origin-top-right bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none`}
                   role="menu"
                   tabIndex="-1"
                   ref={menuRef}
                 >
-                  <div className="py-1" role="none">
-                    <form action="#" method="POST" role="none">
+                  <div
+                    className="bg-white hover:bg-gray-700 hover:text-gray-50 rounded-xl"
+                    role="none"
+                  >
+                    <div>
                       <button
                         onClick={handleLogout}
-                        to="/"
-                        className="text-red-700 block w-full px-4 py-2 text-left text-sm"
-                        id="menu-item-3"
-                        role="menuitem"
-                        tabIndex="-1"
-                        type="submit"
+                        className="text-gray-800 bg-white hover:bg-gray-700 hover:text-gray-50 block w-full px-4 py-3 text-left text-sm"
                       >
                         Sign out
                       </button>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -196,8 +195,9 @@ const AdminBody = () => {
         {/* ---------------- SIDEBAR ---------------- */}
         <aside
           aria-label="Sidenav"
-          className={`fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            } bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700`}
+          className={`fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700`}
         >
           <div className="overflow-y-auto py-5 px-0 h-full bg-gray-50 dark:bg-gray-800">
             <ul className=" mt-7">
@@ -206,10 +206,11 @@ const AdminBody = () => {
                 <Link
                   to="/admin"
                   onClick={handleMoveToTop}
-                  className={`h-14 pl-4 flex items-center p-2 text-base font-medium ${location.pathname === "/admin"
-                    ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 "
-                    : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 hover:bg-gray-100"
-                    } group`}
+                  className={`h-14 pl-4 flex items-center p-2 text-base font-medium ${
+                    location.pathname === "/admin"
+                      ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 "
+                      : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 hover:bg-gray-100"
+                  } group`}
                 >
                   {theme === "dark" ? (
                     <img
@@ -233,10 +234,11 @@ const AdminBody = () => {
                 <Link
                   onClick={handleMoveToTop}
                   to="/admin/all_product"
-                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${location.pathname === "/admin/all_product"
-                    ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
-                    : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
-                    } group`}
+                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${
+                    location.pathname === "/admin/all_product"
+                      ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
+                      : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
+                  } group`}
                 >
                   {theme === "dark" ? (
                     <img
@@ -260,10 +262,11 @@ const AdminBody = () => {
                 <Link
                   to="/admin/create_product"
                   onClick={handleMoveToTop}
-                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${location.pathname === "/admin/create_product"
-                    ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
-                    : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
-                    } group`}
+                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${
+                    location.pathname === "/admin/create_product"
+                      ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
+                      : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
+                  } group`}
                 >
                   {theme === "dark" ? (
                     <img
@@ -287,10 +290,11 @@ const AdminBody = () => {
                 <Link
                   to="/admin/view_orders"
                   onClick={handleMoveToTop}
-                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${location.pathname === "/admin/view_orders"
-                    ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
-                    : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
-                    } group`}
+                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${
+                    location.pathname === "/admin/view_orders"
+                      ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
+                      : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
+                  } group`}
                 >
                   {theme === "dark" ? (
                     <img
@@ -314,10 +318,11 @@ const AdminBody = () => {
                 <Link
                   to="/admin/create_coupon"
                   onClick={handleMoveToTop}
-                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${location.pathname === "/admin/create_coupon"
-                    ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
-                    : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
-                    } group`}
+                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${
+                    location.pathname === "/admin/create_coupon"
+                      ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
+                      : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
+                  } group`}
                 >
                   {theme === "dark" ? (
                     <img
@@ -341,10 +346,11 @@ const AdminBody = () => {
                 <Link
                   to="/admin/reviews"
                   onClick={handleMoveToTop}
-                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${location.pathname === "/admin/reviews"
-                    ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
-                    : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
-                    } group`}
+                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${
+                    location.pathname === "/admin/reviews"
+                      ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
+                      : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
+                  } group`}
                 >
                   {theme === "dark" ? (
                     <img

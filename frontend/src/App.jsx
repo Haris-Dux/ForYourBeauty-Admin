@@ -14,15 +14,16 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { userSessionAsync } from "./features/authSlice";
 import SendOtp from "./auth/SendOtp";
+import VerifyOtp from "./auth/VerifyOtp";
 import CreateCoupon from "./admin/CreateCoupon";
 import Reviews from "./admin/Reviews";
-
+import ResetPassword from "./auth/ResetPassword";
 
 function App() {
   const dispatch = useDispatch();
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(userSessionAsync());
-  })
+  });
 
   return (
     <>
@@ -33,7 +34,8 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/sendOtp" element={<SendOtp />} />
-          <Route path="/verifyOtp" element={<SendOtp />} />
+          <Route path="/verifyOtp" element={<VerifyOtp />} />
+          <Route path="/reset" element={<ResetPassword />} />
 
           {/* ADMIN ROUTE */}
           <Route path="/admin" element={<AdminPanel />}>
