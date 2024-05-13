@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllProductsAsync } from "../features/productSlice";
 
 const AllProducts = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
 
   const toggleDropdown = () => {
@@ -26,12 +29,61 @@ const AllProducts = () => {
   }, []);
 
   const { products, isLoading } = useSelector((state) => state.product);
-  // console.log('products', products);
+
+  const [searchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page")) || 1;
+  const category = searchParams.get("category") || "All";
 
   const handleUpdate = (id) => {
     navigate(`/admin/update_product/${id}`);
     window.scroll(0, 0);
   };
+
+  const handleCategoryChange = (category) => {
+    navigate(`/admin/all_product?category=${category}`);
+  };
+
+  const renderPaginationLinks = () => {
+    const totalPages = products?.totalPages;
+    const paginationLinks = [];
+    for (let i = 1; i <= totalPages; i++) {
+      paginationLinks.push(
+        <li key={i}>
+          <Link
+            to={`/admin/all_product?category=${category}&page=${i}`}
+            className={`flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 ${
+              i === page ? "bg-gray-200" : "hover:bg-gray-100"
+            }`}
+            onClick={() => dispatch(getAllProductsAsync({ category, page: i }))}
+          >
+            {i}
+          </Link>
+        </li>
+      );
+    }
+    return paginationLinks;
+  };
+
+  const categories = ["Skincare", "Body Care", "Haircare", "Cosmetics"];
+
+  useEffect(() => {
+    if (searchQuery) {
+      const timer = setTimeout(() => {
+        dispatch(getAllProductsAsync({ category: "All", search: searchQuery }));
+      }, 1500);
+      return () => clearTimeout(timer);
+    } else if (searchQuery !== undefined && searchQuery !== null) {
+      dispatch(getAllProductsAsync({ category, page }));
+    }
+  }, [dispatch, page, category, searchQuery]);
+
+  const handleSearch = (e) => {
+    const query = e.target.value.trim();
+    setSearchQuery(query);
+  };
+
+  const disabled = products?.page === products?.totalPages;
+  console.log(disabled);
 
   return (
     <>
@@ -68,15 +120,47 @@ const AllProducts = () => {
               <header className="flex justify-between items-center flex-wrap">
                 <div className="heading">
                   <h2 className="playfair text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
-                    All Product Collection
+                    All Products
                   </h2>
-
-                  <p className="mt-4 max-w-xl text-gray-500 dark:text-gray-400">
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                    Itaque praesentium cumque iure dicta incidunt est ipsam,
-                    officia dolor fugit natus?
-                  </p>
                 </div>
+
+                {/* Searh Bar */}
+
+                <form className="max-w-md mx-auto">
+                  <label
+                    htmlFor="default-search"
+                    className="text-sm font-medium text-gray-900 sr-only dark:text-white"
+                  >
+                    Search
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                      <svg
+                        className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="search"
+                      id="default-search"
+                      placeholder="Search By Name"
+                      className="block w-full ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-[#EC72AF] focus:border-[#EC72AF] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#EC72AF] dark:focus:border-[#EC72AF]"
+                      defaultValue={searchQuery}
+                      onChange={handleSearch}
+                    />
+                  </div>
+                </form>
 
                 {/* DROPDOWN FOR SORTING PRODUCTS */}
                 <div className="mt-1">
@@ -127,9 +211,16 @@ const AllProducts = () => {
                           aria-labelledby="filterDropdownButton"
                           className="space-y-2 text-sm"
                         >
-                          <li className="flex items-center text-gray-900 dark:text-gray-100 cursor-pointer">
-                            Latest (56)
-                          </li>
+                          {categories.map((item) => (
+                            <li
+                              key={item}
+                              value={item}
+                              className="flex items-center text-gray-900 dark:text-gray-100 cursor-pointer"
+                              onClick={() => handleCategoryChange(item)}
+                            >
+                              {item}
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     )}
@@ -137,34 +228,147 @@ const AllProducts = () => {
                 </div>
               </header>
 
-              <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {products?.map((data) => (
-                  <li key={data?._id} onClick={() => handleUpdate(data?._id)}>
-                    <div className="group block overflow-hidden cursor-pointer">
-                      <img
-                        src={data?.image?.secure_url}
-                        alt=""
-                        className="h-[350px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[450px]"
-                      />
+              {products?.productData?.length > 0 ? (
+                <>
+                  <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {products?.productData?.map((data) => (
+                      <li key={data?.id} onClick={() => handleUpdate(data?.id)}>
+                        <div className="group block overflow-hidden cursor-pointer">
+                          <img
+                            src={data?.image?.downloadURL}
+                            alt=""
+                            className="h-[350px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[450px]"
+                          />
 
-                      <div className="relative bg-white pt-3">
-                        <h3 className="text-xs text-gray-700 group-hover:underline group-hover:underline-offset-4">
-                          {data?.name}
-                        </h3>
+                          <div className="relative bg-white pt-3">
+                            <h3 className="text-xs text-gray-700 group-hover:underline group-hover:underline-offset-4">
+                              {data?.name}
+                            </h3>
 
-                        <p className="mt-2">
-                          <span className="sr-only"> Regular Price </span>
+                            <p className="mt-2">
+                              <span className="sr-only"> Regular Price </span>
 
-                          <span className="tracking-wider text-gray-900">
-                            {" "}
-                            Rs. {data?.price}{" "}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                              <span className="tracking-wider text-gray-900">
+                                {" "}
+                                Rs. {data?.price}{" "}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex justify-center">
+                    <nav aria-label="Page navigation example">
+                      <ul className="flex items-center -space-x-px h-8 py-10 text-sm">
+                        <li>
+                          {products?.page > 1 ? (
+                            <Link
+                              to={`/admin/all_product?category=${category}&page=${
+                                page - 1
+                              }`}
+                              className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                            >
+                              <span className="sr-only">Previous</span>
+                              <svg
+                                className="w-2.5 h-2.5 rtl:rotate-180"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 6 10"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 1 1 5l4 4"
+                                />
+                              </svg>
+                            </Link>
+                          ) : (
+                            <button
+                              className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg cursor-not-allowed"
+                              disabled
+                            >
+                              <span className="sr-only">Previous</span>
+                              <svg
+                                className="w-2.5 h-2.5 rtl:rotate-180"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 6 10"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 1 1 5l4 4"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                        </li>
+                        {renderPaginationLinks()}
+                        <li>
+                          {products?.totalPages !== page ? (
+                            <Link
+                              to={`/admin/all_product?category=${category}&page=${
+                                page + 1
+                              }`}
+                              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                            >
+                              <span className="sr-only">Next</span>
+                              <svg
+                                className="w-2.5 h-2.5 rtl:rotate-180"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 6 10"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="m1 9 4-4-4-4"
+                                />
+                              </svg>
+                            </Link>
+                          ) : (
+                            <button
+                              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg cursor-not-allowed"
+                              disabled
+                            >
+                              <span className="sr-only">Next</span>
+                              <svg
+                                className="w-2.5 h-2.5 rtl:rotate-180"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 6 10"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="m1 9 4-4-4-4"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </>
+              ) : (
+                <div className="playfair text-xl flex font-medium uppercase items-center  pt-10 ">
+                  No Products
+                </div>
+              )}
             </div>
           </section>
         </>

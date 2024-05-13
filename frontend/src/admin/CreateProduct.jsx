@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 const CreateProduct = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
   const categories = ["Skincare", "Body Care", "Haircare", "Cosmetics"];
 
   const subCategories = {
@@ -23,12 +22,6 @@ const CreateProduct = () => {
     ],
     Cosmetics: [],
   };
-
-  // Map categories to objects
-  //   const categoriesObjects = categories.map((category, index) => ({
-  //     id: index + 1,
-  //     name: category,
-  //   }));
 
   const { createLoading } = useSelector((state) => state.product);
 
@@ -81,35 +74,42 @@ const CreateProduct = () => {
       [name]: newValue,
     });
   };
-  console.log("FormData object:", formdata.file);
 
   // HANDLE SUBMIT
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (formdata?.file) {
-      console.log("Formdata before FormData creation:", formdata);
-
       const formData = new FormData();
-      formData.append("file", formdata.file);
+      formData.append("filename", formdata.file);
       formData.append("name", formdata.name);
       formData.append("price", formdata.price);
       formData.append("sale_price", formdata.sale_price);
       formData.append("category", formdata.category);
       formData.append("subCategory", formdata.subCategory);
-      formData.append("quantity", formdata.quantity);
+      formData.append("stock", formdata.quantity);
       formData.append("description", formdata.description);
       formData.append("latest", formdata.latest);
 
-      console.log("FormData object:", formData);
-
-      // dispatch(createProductAsync(formData)).then(() => {
-      //   navigate("/admin/all_product");
-      //   window.scroll(0, 0);
-      // });
-    } else {
-      toast.error("Upload product with image");
-    }
+      try {
+        dispatch(createProductAsync(formData)).then((res)=>{
+         if(res.payload.message){
+          setFormdata({
+            name: "",
+            price: "",
+            sale_price: "",
+            category: "",
+            subCategory: "",
+            quantity: "",
+            description: "",
+            file: null,
+            latest: false,
+          })
+         }
+        })
+      } catch (error) {
+        throw new Error(error)
+      }
+    
   };
 
   return (
@@ -300,7 +300,7 @@ const CreateProduct = () => {
               </div>
 
               {/* IMAGE */}
-              {formdata?.image ? (
+              {formdata?.file ? (
                 <div className="sm:col-span-2">
                   <div className="flex items-center justify-center w-full">
                     <label
@@ -362,14 +362,11 @@ const CreateProduct = () => {
               )}
             </div>
 
-            {/* <button type="submit" className="flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-6 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800">
-                            Add product
-                        </button> */}
-
             {createLoading ? (
               <button
+              disabled={createLoading}
                 type="button"
-                className="w-36 flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white bg-primary-800 rounded-lg"
+                className= {`w-36 flex cursor-not-allowed justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white bg-primary-300 rounded-lg`} 
               >
                 <svg
                   width="20"

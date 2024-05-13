@@ -17,7 +17,7 @@ export const addProduct = async (req, res, next) => {
       subCategory,
       latest,
     } = req.body;
-    if (!name || !description || !price || !stock || !category || !subCategory)
+    if (!name || !description || !price || !stock || !category)
       throw new Error("Please provide all required fields");
     if (price <= 0 && stock <= 0) {
       throw new Error("Value must be greater then 0");
@@ -44,6 +44,7 @@ export const addProduct = async (req, res, next) => {
       sale_price,
       latest,
     });
+    return res.status(200).json({ message: "Product Added Successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -149,26 +150,66 @@ export const getLatestPRoducts = async (req, res, next) => {
   }
 };
 
+// export const getProducts = async (req, res, next) => {
+//   try {
+//     let page = parseInt(req.query.page) || 1;
+//     let query = {};
+
+//     // if (req.query.category && req.query.category !== 'null') {
+//     //   query.category = req.query.category;
+//     // };
+    
+//     console.log("q",query);
+//     console.log("p",page);
+//     const limit = 5;
+//     const productData = await ProductsModel.find()
+//       .limit(limit)
+//       .skip((page - 1) * limit)
+//       .exec();
+
+//     const count = await ProductsModel.countDocuments();
+//     setMongoose();
+//     return res.status(200).json({
+//       productData,
+//       totalPages: Math.ceil(count / limit),
+//       currentPage: page,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// };
+
 export const getProducts = async (req, res, next) => {
   try {
-    var page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
+    const page = parseInt(req.query.page) || 1; 
     const limit = 5;
-    const products = await ProductsModel.find({ latest: false })
-      .limit(limit)
-      .skip((page - 1) * limit)
-      .exec();
+    let search = req.query.search || "";
+    let category = req.query.category || "All";
 
-    const count = await ProductsModel.find({ latest: false }).countDocuments();
-    setMongoose();
-    return res.status(200).json({
-      products,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    let query = {
+      name: { $regex: search, $options: "i" }
+    };
+
+    if (category !== "All") {
+      query.category = category;
+    }
+   
+    const productData = await ProductsModel.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await ProductsModel.countDocuments(query);
+
+    const response = {
+      totalPages:Math.ceil(total / limit),
+      page,
+      productData,
+    };
+
+    res.status(200).json(response);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: true, message: "Internal Server Error" });
   }
 };
+

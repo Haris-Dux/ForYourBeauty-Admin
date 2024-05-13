@@ -15,8 +15,8 @@ const initialState = {
 };
 
 //API URL
-// const getProductUrl = "http://localhost:4000/api/products/getProducts";
-const createProductUrl = "http://localhost:8000/api/products/addProduct";
+const getProductsUrl = `http://localhost:8080/api/products/getProducts`;
+const createProductUrl = "http://localhost:8080/api/products/addProduct";
 // const updateProductUrl = "http://localhost:4000/api/products/updateProduct";
 // const deleteProductUrl = "http://localhost:4000/api/products/deleteProduct";
 // const getLatestProductUrl = "http://localhost:4000/api/products/getLatestPRoducts";
@@ -26,20 +26,30 @@ export const createProductAsync = createAsyncThunk(
   "Shop/create",
   async (formdata) => {
     try {
-      const response = await axios.post(createProductUrl, formdata, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(createProductUrl, formdata)
       toast.success(response.data.message);
-      console.log(response.data);
       return response.data;
     } catch (error) {
-      console.log(error.response.data.error);
       toast.error(error.response.data.error);
     }
   }
 );
+
+//GET PRODUCTS
+export const getAllProductsAsync = createAsyncThunk(
+  "Shop/getProduts",
+  async (data) => {
+
+    const searchQuery = data?.search !== undefined && data?.search !== null ? `&search=${data?.search}` : "";
+    try {
+      const response = await axios.post(`${getProductsUrl}?category=${data.category}&page=${data.page}${searchQuery}`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
 
 const productSlice = createSlice({
   name: "productSlice",
@@ -55,28 +65,17 @@ const productSlice = createSlice({
       })
       .addCase(createProductAsync.fulfilled, (state, action) => {
         state.createLoading = false;
-        state.isSuccess = true;
-        state.products.push(action.payload);
       })
-      .addCase(createProductAsync.rejected, (state, action) => {
-        state.createLoading = false;
-        state.isError = true;
-        state.message = action.payload;
-      });
 
-    // .addCase(getProductAsync.pending, (state, action) => {
-    //   state.isLoading = true;
-    // })
-    // .addCase(getProductAsync.fulfilled, (state, action) => {
-    //   state.isLoading = false;
-    //   state.isSuccess = true;
-    //   state.products = action.payload;
-    // })
-    // .addCase(getProductAsync.rejected, (state, action) => {
-    //   state.isLoading = false;
-    //   state.isError = true;
-    //   state.message = action.payload;
-    // })
+
+    .addCase(getAllProductsAsync.pending, (state, action) => {
+      state.isLoading = true;
+    })
+    .addCase(getAllProductsAsync.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.products = action.payload;
+    })
+    
 
     // .addCase(deleteGoalsAsync.pending, (state, action) => {
     //   // state.isLoading = true;

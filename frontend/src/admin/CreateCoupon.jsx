@@ -2,43 +2,13 @@ import { useSelector } from "react-redux";
 // import product from "./ProductData";
 import { useEffect, useRef, useState } from "react";
 
-const data = [
-  {
-    name: "Suheer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Haris",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Umer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Suheer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-];
-
 const CreateCoupon = () => {
   const { isLoading } = useSelector((state) => state.product);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const dropdownRef = useRef(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const handleCheckboxChange = () => {
     setIsCheckboxChecked(!isCheckboxChecked);
@@ -62,12 +32,34 @@ const CreateCoupon = () => {
     };
   }, []);
 
+  const [formdata,setFormdata] = useState({
+    code:'',
+    discountAmount:0,
+    total_limit:0,
+    expiresAt:'',
+    allProducts:false,
+    categories:selectedCategory,
+    isActive:false
+  });
+
+   // Function to handle category selection
+   const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setIsOpen(false); // Close dropdown after selection
+  };
+
+  const handleSubmit = () => {
+    console.log(formdata);
+  }
+
+  const data = []
+
   return (
     <>
       {isLoading ? (
         <>
           <div
-            className="mx-auto flex justify-center items-center h-screen max-w-screen-xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
+            className="mx-auto flex justify-center min-h-screen items-center h-screen max-w-screen-xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
             role="status"
           >
             <svg
@@ -96,71 +88,71 @@ const CreateCoupon = () => {
               Create Coupon
             </h2>
             <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 lg:grid-cols-2 xl:grid-cols-2 lg:gap-4">
-              {/* NAME */}
+              {/* Code */}
               <div className="">
                 <input
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="name"
-                  name="name"
-                  placeholder="Type product name"
+                  id="code"
+                  name="code"
+                  placeholder="Enter Code"
                   type="text"
-                  //   value={formdata.name}
-                  //   onChange={(e) =>
-                  //     setFormdata({ ...formdata, name: e.target.value })
-                  //   }
+                    value={formdata.code}
+                    onChange={(e) =>
+                      setFormdata({ ...formdata, code: e.target.value })
+                    }
                   required
                 />
               </div>
 
-              {/* NAME */}
+              {/* DISCOUNT AMOUNT */}
               <div className="">
                 <input
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="name"
-                  name="name"
-                  placeholder="Type product name"
+                  id="discountAmount"
+                  name="discountAmount"
+                  placeholder="Enter Discount Amount"
                   type="text"
-                  //   value={formdata.name}
-                  //   onChange={(e) =>
-                  //     setFormdata({ ...formdata, name: e.target.value })
-                  //   }
+                    value={formdata.discountAmount}
+                    onChange={(e) =>
+                      setFormdata({ ...formdata, discountAmount: e.target.value })
+                    }
                   required
                 />
               </div>
 
-              {/* NAME */}
+              {/* Total_limit */}
               <div className="">
                 <input
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="name"
-                  name="name"
-                  placeholder="Type product name"
+                  id="total_limit"
+                  name="total_limit"
+                  placeholder="Enter Total Limit"
                   type="text"
-                  //   value={formdata.name}
-                  //   onChange={(e) =>
-                  //     setFormdata({ ...formdata, name: e.target.value })
-                  //   }
+                    value={formdata.total_limit}
+                    onChange={(e) =>
+                      setFormdata({ ...formdata, total_limit: e.target.value })
+                    }
                   required
                 />
               </div>
 
-              {/* NAME */}
+              {/* Expires At */}
               <div className="">
                 <input
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="name"
-                  name="name"
-                  placeholder="Type product name"
-                  type="text"
-                  //   value={formdata.name}
-                  //   onChange={(e) =>
-                  //     setFormdata({ ...formdata, name: e.target.value })
-                  //   }
+                  id="expiresAt"
+                  name="expiresAt"
+                  placeholder="Select Date"
+                  type="date"
+                    value={formdata.expiresAt}
+                    onChange={(e) =>
+                      setFormdata({ ...formdata, expiresAt: e.target.value })
+                    }
                   required
                 />
               </div>
 
-              {/* DROPDOWN FOR SORTING PRODUCTS */}
+              {/* DROPDOWN FOR SELECTING CATEGORIES */}
               <div className="mt-1">
                 <div ref={dropdownRef} className="relative">
                   <button
@@ -172,7 +164,7 @@ const CreateCoupon = () => {
                     onClick={toggleDropdown}
                     disabled={isCheckboxChecked}
                   >
-                    Filter
+                    Select Category
                     <svg
                       aria-hidden="true"
                       className={`-mr-1 ml-1.5 w-5 h-5 transform ${
@@ -199,16 +191,28 @@ const CreateCoupon = () => {
                         aria-labelledby="filterDropdownButton"
                         className="text-sm"
                       >
-                        <li className="px-4 py-2.5 flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer">
+                        <li
+                          className="px-4 py-2.5 flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer"
+                          onClick={() => handleCategorySelect("Skincare")}
+                        >
                           Skincare
                         </li>
-                        <li className="px-4 py-2.5 flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer">
+                        <li
+                          className="px-4 py-2.5 flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer"
+                          onClick={() => handleCategorySelect("Body Care")}
+                        >
                           Body Care
                         </li>
-                        <li className="px-4 py-2.5 flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer">
+                        <li
+                          className="px-4 py-2.5 flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer"
+                          onClick={() => handleCategorySelect("Haircare")}
+                        >
                           Haircare
                         </li>
-                        <li className="px-4 py-2.5 flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer">
+                        <li
+                          className="px-4 py-2.5 flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer"
+                          onClick={() => handleCategorySelect("Cosmetics")}
+                        >
                           Cosmetics
                         </li>
                       </ul>
@@ -228,8 +232,13 @@ const CreateCoupon = () => {
                       type="checkbox"
                       className="size-4 rounded border-gray-300"
                       id="Option1"
-                      checked={isCheckboxChecked}
-                      onChange={handleCheckboxChange}
+                      checked={formdata.allProducts}
+                      onChange={() =>
+                        setFormdata({
+                          ...formdata,
+                          allProducts: !formdata.allProducts,
+                        })
+                      }
                     />
                   </div>
                   <div>
@@ -249,7 +258,13 @@ const CreateCoupon = () => {
                       type="checkbox"
                       className="size-4 rounded border-gray-300"
                       id="Option3"
-                      checked
+                      checked={formdata.isActive}
+                      onChange={() =>
+                        setFormdata({
+                          ...formdata,
+                          isActive: !formdata.isActive,
+                        })
+                      }
                     />
                   </div>
 
@@ -262,7 +277,7 @@ const CreateCoupon = () => {
               </fieldset>
             </div>
 
-            <button className="mt-7 flex justify-center items-center mx-auto px-6 py-2.5 bg-[#EC72AF] text-white">
+            <button onClick={handleSubmit}  className="mt-7 flex justify-center items-center mx-auto px-6 py-2.5 bg-[#EC72AF] text-white">
               Create Now
             </button>
           </section>

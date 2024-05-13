@@ -40,7 +40,7 @@ function App() {
           {/* ADMIN ROUTE */}
           <Route path="/admin" element={<AdminPanel />}>
             <Route index element={<Dashboard />} />
-            <Route path="all_product" element={<AllProducts />} />
+            <Route path="/admin/all_product" element={<AllProducts />} />
             <Route path="create_product" element={<CreateProduct />} />
             <Route path="update_product/:id" element={<UpdateProduct />} />
             <Route path="view_orders" element={<ViewOrders />} />
