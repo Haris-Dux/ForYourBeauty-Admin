@@ -1,85 +1,123 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  createProductAsync,
+  getAllProductsAsync,
+  updateProductAsync,
+} from "../features/productSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-// import { deleteGoalsAsync, updateProductAsync } from "../features/productSlice";
-import { FaImage } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const UpdateProduct = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
+  const categories = ["Skincare", "Body Care", "Haircare", "Cosmetics"];
 
-  // Getting all products
-  const { products, isLoading, updateLoading, deleteLoading } = useSelector(
-    (state) => state.product
+  const { products, isLoading } = useSelector((state) => state.product);
+
+  // SELECTED PRODUCT
+  const selectedProduct = products?.productData?.filter(
+    (data) => data.id === id
   );
+  console.log("selectedProduct", selectedProduct);
 
-  // Filter selected Product
-  const selectedProduct = products.find((product) => product._id === id);
+  // useEffect(() => {
+  //   dispatch(getAllProductsAsync());
+  // }, [id]);
 
-  const categories = [
-    "Fitness",
-    "Kids",
-    "Pets",
-    "Health & Beauty",
-    "Home",
-    "Electronics",
-  ];
+  const subCategories = {
+    Skincare: ["Facewash", "Serums", "Moisturiser", "Toner"],
+    "Body Care": ["Shower gels", "Body butter", "Body oil", "Body scrubs"],
+    Haircare: [
+      "Shampoo",
+      "Conditioner",
+      "Mask",
+      "Hair oil",
+      "Hair serum",
+      "Hair mist",
+    ],
+    Cosmetics: [],
+  };
 
-  const categoriesObjects = categories.map((category, index) => ({
-    id: index + 1,
-    name: category,
-  }));
+  const { createLoading } = useSelector((state) => state.product);
 
-  // Formdata
   const [formdata, setFormdata] = useState({
     name: "",
-    item_code: "",
     price: "",
+    sale_price: "",
     category: "",
+    subCategory: "",
     quantity: "",
     description: "",
-    image: null,
-    topSales: false,
+    file: null,
+    latest: false,
   });
 
   useEffect(() => {
-    if (id && selectedProduct) {
-      setFormdata((prevData) => ({
-        ...prevData,
-        name: selectedProduct.name || "",
-        item_code: selectedProduct.item_code || "",
-        price: selectedProduct.price || "",
-        category: selectedProduct.category || "",
-        quantity: selectedProduct.quantity || "",
-        description: selectedProduct.description || "",
-        image: selectedProduct.image || "",
-        topSales: selectedProduct.topSales || false,
+    if (selectedProduct.length > 0) {
+      const productData = selectedProduct[0];
+
+      setFormdata((prevFormData) => ({
+        ...prevFormData,
+        name: productData?.name || "",
+        price: productData?.price || "",
+        sale_price: productData?.sale_price || "",
+        category: productData?.category || "",
+        subCategory: productData?.subCategory || "",
+        quantity: productData?.stock || "",
+        description: productData?.description || "",
+        file: {
+          ...prevFormData.file,
+          downloadURL: productData?.image.downloadURL || "",
+        },
+        latest: productData?.latest || false,
       }));
     }
   }, []);
 
-  // HANDLE IMAGE CHANGE
+  const handleChange = (e, field) => {
+    const value = e.target.value;
+    setFormdata((prevFormData) => ({ ...prevFormData, [field]: value }));
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setFileToBase(file);
+    setFormdata((prevFormData) => ({ ...prevFormData, file: file }));
   };
 
-  const setFileToBase = (file) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setFormdata({ ...formdata, image: reader.result });
-    };
+  const handleRemoveImage = () => {
+    setFormdata((prevFormData) => ({ ...prevFormData, file: null }));
   };
 
-  const resetImage = () => {
-    setFormdata({ ...formdata, image: "" });
-    fileInputRef.current.value = "";
+  const handleCategoryChange = (e) => {
+    const selectedCategory = e.target.value;
+    setFormdata({
+      ...formdata,
+      category: selectedCategory,
+      subCategory: "",
+    });
   };
 
-  // HANDLE CHECK CHANGE
+  const handleSubCategoryChange = (e) => {
+    const selectedSubCategory = e.target.value;
+    setFormdata({ ...formdata, subCategory: selectedSubCategory });
+  };
+
+  // const handleChange = (e, fieldName) => {
+  //   if (e.target.type === "file") {
+  //     setFormdata({
+  //       ...formdata,
+  //       [fieldName]: e.target.files[0],
+  //     });
+  //   } else {
+  //     setFormdata({
+  //       ...formdata,
+  //       [fieldName]: e.target.value,
+  //     });
+  //   }
+  // };
+
   const handleCheckChange = (event) => {
     const { name, type, checked } = event.target;
     const newValue = type === "checkbox" ? checked : event.target.value;
@@ -94,43 +132,61 @@ const UpdateProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const updatedFormdata = {
-      ...formdata,
-      id: id,
-    };
+    const formData = new FormData();
 
-    // dispatch(updateProductAsync(updatedFormdata)).then(() => {
-    //   navigate("/admin");
-    //   window.scroll(0, 0);
-    // });
-  };
+    // Check each field and append it to formData if it's updated
+    if (formdata.file) formData.append("filename", formdata.file);
+    if (formdata.name) formData.append("name", formdata.name);
+    if (formdata.price) formData.append("price", formdata.price);
+    if (formdata.sale_price) formData.append("sale_price", formdata.sale_price);
+    if (formdata.category) formData.append("category", formdata.category);
+    if (formdata.subCategory)
+      formData.append("subCategory", formdata.subCategory);
+    if (formdata.quantity) formData.append("stock", formdata.quantity);
+    if (formdata.description)
+      formData.append("description", formdata.description);
+    if (formdata.latest) formData.append("latest", formdata.latest);
 
-  // HADNLE DELETE
-  const handleDelete = (id) => {
-    // dispatch(deleteGoalsAsync(id)).then(() => {
-    //   navigate("/admin");
-    //   window.scroll(0, 0);
-    // });
+    try {
+      dispatch(updateProductAsync(formData)).then((res) => {
+        if (res.payload.message) {
+          setFormdata({
+            name: "",
+            price: "",
+            sale_price: "",
+            category: "",
+            subCategory: "",
+            quantity: "",
+            description: "",
+            file: null,
+            latest: false,
+          });
+        }
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   return (
     <>
-      <section className="bg-gray-200 dark:bg-gray-900">
-        <div className="py-8 px-18 sm:px-20 md:px-16 lg:px-44 mx-auto max-w-full lg:py-10">
-          <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+      <section className="bg-[#E5E5E5] dark:bg-gray-900">
+        <div className="py-8 px-18 sm:px-20 md:px-16 lg:px-14 mx-auto max-w-full lg:py-10">
+          <h2 className="mb-5 playfair text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
             Update product
           </h2>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-              <div className="sm:col-span-2">
+              {/* NAME */}
+              <div className="">
                 <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
                   htmlFor="name"
                 >
                   Product Name
                 </label>
                 <input
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   id="name"
                   name="name"
                   placeholder="Type product name"
@@ -143,80 +199,16 @@ const UpdateProduct = () => {
                 />
               </div>
 
-              <div className="w-full">
-                <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="item_code"
-                >
-                  Item Code
-                </label>
-                <input
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="item_code"
-                  name="item_code"
-                  placeholder="Item Code"
-                  type="text"
-                  value={formdata.item_code}
-                  onChange={(e) =>
-                    setFormdata({ ...formdata, item_code: e.target.value })
-                  }
-                  required
-                />
-              </div>
-
-              <div className="w-full">
-                <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="price"
-                >
-                  Price
-                </label>
-                <input
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="price"
-                  name="price"
-                  placeholder="Price"
-                  type="number"
-                  value={formdata.price}
-                  onChange={(e) =>
-                    setFormdata({ ...formdata, price: e.target.value })
-                  }
-                  required
-                />
-              </div>
-
+              {/* QUANTITY */}
               <div>
                 <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="category"
-                >
-                  Category
-                </label>
-                <select
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="category"
-                  value={formdata.category}
-                  onChange={(e) =>
-                    setFormdata({ ...formdata, category: e.target.value })
-                  }
-                >
-                  {categoriesObjects.map((cat) => (
-                    <option key={cat.id} value={cat.name}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
                   htmlFor="quantity"
                 >
                   Quantity
                 </label>
                 <input
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   id="quantity"
                   name="quantity"
                   placeholder="Available quantity"
@@ -229,9 +221,105 @@ const UpdateProduct = () => {
                 />
               </div>
 
+              {/* PRICE */}
+              <div className="w-full">
+                <label
+                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor="price"
+                >
+                  Price
+                </label>
+                <input
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  id="price"
+                  name="price"
+                  placeholder="Price"
+                  type="number"
+                  value={formdata.price}
+                  onChange={(e) =>
+                    setFormdata({ ...formdata, price: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              {/* SALE PRICE */}
+              <div className="w-full">
+                <label
+                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor="sale_price"
+                >
+                  Sale Price
+                </label>
+                <input
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  id="sale_price"
+                  name="sale_price"
+                  placeholder="Sale Price"
+                  type="number"
+                  value={formdata.sale_price}
+                  onChange={(e) =>
+                    setFormdata({ ...formdata, sale_price: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              {/* CATEGORY */}
+              <div>
+                <label
+                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor="category"
+                >
+                  Category
+                </label>
+                <select
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  id="category"
+                  value={formdata.category}
+                  onChange={handleCategoryChange}
+                >
+                  <option value="" disabled>
+                    Select category
+                  </option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* SUB CATEGORY */}
+              <div>
+                <label
+                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor="category"
+                >
+                  Sub Category
+                </label>
+                <select
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  id="subcategory"
+                  value={formdata.subCategory}
+                  onChange={handleSubCategoryChange}
+                  disabled={!formdata.category}
+                >
+                  <option value="" disabled>
+                    Select subcategory
+                  </option>
+                  {subCategories[formdata.category]?.map((subCategory) => (
+                    <option key={subCategory} value={subCategory}>
+                      {subCategory}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* DESC */}
               <div className="sm:col-span-2">
                 <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
                   htmlFor="description"
                 >
                   Description
@@ -248,49 +336,51 @@ const UpdateProduct = () => {
                 />
               </div>
 
+              {/* LATEST PRODUCTS */}
               <div className="flex items-center">
                 <input
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                   defaultValue=""
                   id="default-checkbox"
                   type="checkbox"
-                  name="topSales"
-                  checked={formdata.topSales}
+                  name="latest"
+                  checked={formdata.latest}
                   onChange={handleCheckChange}
                 />
                 <label
                   className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                   htmlFor="default-checkbox"
                 >
-                  Top Sales
+                  Latest Products
                 </label>
               </div>
 
               {/* IMAGE */}
-              {formdata?.image ? (
-                <div className="sm:col-span-2 relative">
-                  <div className="flex items-center justify-center w-full">
+              {formdata?.file?.downloadURL ? (
+                <div className="sm:col-span-2">
+                  <div className="flex items-center justify-center w-full relative">
                     <label
                       className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600"
                       htmlFor="dropzone-file"
                     >
                       <img
-                        src={formdata?.image?.secure_url}
+                        src={formdata.file.downloadURL}
                         alt="Selected"
                         className="h-full"
+                        onClick={() => {
+                          const fileInput =
+                            document.getElementById("dropzone-file");
+                          if (fileInput) fileInput.click();
+                        }}
+                        style={{ cursor: "pointer" }}
                       />
                     </label>
-                  </div>
-                  <div className="reset_button absolute top-3 right-3 bottom-0">
                     <button
+                      className="absolute bottom-2 right-2 px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                      onClick={handleRemoveImage}
                       type="button"
-                      onClick={resetImage}
-                      className="reset_image"
                     >
-                      <FaImage
-                        size={22}
-                        className="text-gray-700 dark:text-white"
-                      />
+                      Remove Image
                     </button>
                   </div>
                 </div>
@@ -329,10 +419,7 @@ const UpdateProduct = () => {
                         className="hidden"
                         id="dropzone-file"
                         type="file"
-                        // id="file"
                         onChange={handleImageChange}
-                        accept="image/*"
-                        ref={fileInputRef}
                       />
                     </label>
                   </div>
@@ -340,58 +427,31 @@ const UpdateProduct = () => {
               )}
             </div>
 
-            <div className="buttons_bar flex justify-between items-center">
-              {updateLoading ? (
-                <button
-                  type="button"
-                  className="w-40 flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white rounded-lg bg-primary-800"
+            {createLoading ? (
+              <button
+                disabled={createLoading}
+                type="button"
+                className={`w-36 flex cursor-not-allowed justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white bg-primary-300 rounded-lg`}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  className="mr-2 animate-spin"
+                  viewBox="0 0 1792 1792"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="currentColor"
-                    className="mr-2 animate-spin"
-                    viewBox="0 0 1792 1792"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M526 1394q0 53-37.5 90.5t-90.5 37.5q-52 0-90-38t-38-90q0-53 37.5-90.5t90.5-37.5 90.5 37.5 37.5 90.5zm498 206q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-704-704q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm1202 498q0 52-38 90t-90 38q-53 0-90.5-37.5t-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-964-996q0 66-47 113t-113 47-113-47-47-113 47-113 113-47 113 47 47 113zm1170 498q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-640-704q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm530 206q0 93-66 158.5t-158 65.5q-93 0-158.5-65.5t-65.5-158.5q0-92 65.5-158t158.5-66q92 0 158 66t66 158z"></path>
-                  </svg>
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className="w-40 flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800"
-                >
-                  Update product
-                </button>
-              )}
-
-              {deleteLoading ? (
-                <button
-                  type="button"
-                  className="w-40 flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white rounded-lg bg-red-800"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="currentColor"
-                    className="mr-2 animate-spin"
-                    viewBox="0 0 1792 1792"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M526 1394q0 53-37.5 90.5t-90.5 37.5q-52 0-90-38t-38-90q0-53 37.5-90.5t90.5-37.5 90.5 37.5 37.5 90.5zm498 206q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-704-704q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm1202 498q0 52-38 90t-90 38q-53 0-90.5-37.5t-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-964-996q0 66-47 113t-113 47-113-47-47-113 47-113 113-47 113 47 47 113zm1170 498q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-640-704q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm530 206q0 93-66 158.5t-158 65.5q-93 0-158.5-65.5t-65.5-158.5q0-92 65.5-158t158.5-66q92 0 158 66t66 158z"></path>
-                  </svg>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleDelete(id)}
-                  className="w-40 flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800"
-                >
-                  Delete product
-                </button>
-              )}
-            </div>
+                  <path d="M526 1394q0 53-37.5 90.5t-90.5 37.5q-52 0-90-38t-38-90q0-53 37.5-90.5t90.5-37.5 90.5 37.5 37.5 90.5zm498 206q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-704-704q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm1202 498q0 52-38 90t-90 38q-53 0-90.5-37.5t-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-964-996q0 66-47 113t-113 47-113-47-47-113 47-113 113-47 113 47 47 113zm1170 498q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-640-704q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm530 206q0 93-66 158.5t-158 65.5q-93 0-158.5-65.5t-65.5-158.5q0-92 65.5-158t158.5-66q92 0 158 66t66 158z"></path>
+                </svg>
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="w-36 flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-6 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800"
+              >
+                Update product
+              </button>
+            )}
           </form>
         </div>
       </section>
