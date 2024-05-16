@@ -60,11 +60,15 @@ export const updateCoupon = async (req, res, next) => {
       expiresAt,
       allProducts,
       categories,
+      code
     } = req.body;
     if (!id) throw new Error("Coupon Id not found");
     let updateQuery = {};
     if (discountAmount) {
       updateQuery = { ...updateQuery, discountAmount };
+    }
+    if (code) {
+      updateQuery = { ...updateQuery, code };
     }
     if (total_limit) {
       updateQuery = { ...updateQuery, total_limit };

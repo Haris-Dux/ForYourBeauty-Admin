@@ -11,6 +11,7 @@ const initialState = {
 //API URL
 const createCoupunUrl = "http://localhost:8080/api/coupons/createCoupun";
 const getAllCoupunUrl = "http://localhost:8080/api/coupons/getAllCoupons";
+const updateCoupunUrl = "http://localhost:8080/api/coupons/updateCoupon";
 const deleteCoupunUrl = "http://localhost:8080/api/coupons/deleteCoupon";
 
 // Register Function
@@ -27,13 +28,27 @@ export const createCoupunAsync = createAsyncThunk(
   }
 );
 
+export const updateCoupunAsync = createAsyncThunk(
+  "coupon/updateCoupon",
+  async (formData) => {
+    try {
+      const response = await axios.post(updateCoupunUrl, formData);
+      toast.success(response.data.message);
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      toast.error(error.response.data.error);
+    }
+  }
+);
+
 export const getAllCoupunAsync = createAsyncThunk(
   "coupon/getallCoupon",
   async () => {
     try {
       const response = await axios.post(getAllCoupunUrl);
       // toast.success(response.data.message);
-      console.log(response.data);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
       toast.error(error.response.data.error);
@@ -62,7 +77,6 @@ const couponSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      // signup
       .addCase(createCoupunAsync.pending, (state, action) => {
         state.isLoading = true;
       })
@@ -70,14 +84,21 @@ const couponSlice = createSlice({
         state.isLoading = false;
       })
 
-      // signup
       .addCase(getAllCoupunAsync.pending, (state, action) => {
         state.isLoading = true;
       })
       .addCase(getAllCoupunAsync.fulfilled, (state, action) => {
         state.isLoading = false;
         state.coupon = action.payload;
-      });
+      })
+
+      // .addCase(updateCoupunAsync.pending, (state, action) => {
+      //   state.isLoading = true;
+      // })
+      // .addCase(updateCoupunAsync.fulfilled, (state, action) => {
+      //   state.isLoading = false;
+      //   state.coupon = action.payload۔;
+      // });
   },
 });
 

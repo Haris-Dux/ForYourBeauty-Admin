@@ -39,6 +39,9 @@ const ViewOrders = () => {
   const dispatch = useDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredOrders, setFilteredOrders] = useState([]);
+
   const dropdownRef = useRef(null);
 
   const toggleDropdown = () => {
@@ -51,6 +54,22 @@ const ViewOrders = () => {
   useEffect(() => {
     dispatch(getAllOrdersAsync());
   }, []);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredOrders(orders?.orders || []);
+    } else {
+      const filtered = orders?.orders?.filter((order) => {
+        const orderId = order.OrderID.toLowerCase();
+        const searchValue = searchQuery.toLowerCase();
+        return (
+          orderId.includes(searchValue) ||
+          orderId.includes(`FYB-${searchValue}`)
+        );
+      });
+      setFilteredOrders(filtered);
+    }
+  }, [searchQuery, orders]);
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -104,9 +123,11 @@ const ViewOrders = () => {
                     <input
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       id="simple-search"
-                      placeholder="Search"
+                      placeholder="Search by Id"
                       required
                       type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                 </form>
@@ -196,7 +217,7 @@ const ViewOrders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders?.orders?.map((data, index) => (
+                  {filteredOrders.map((data, index) => (
                     <tr
                       key={index}
                       onClick={() => handleOrderDetails(data?.id)}

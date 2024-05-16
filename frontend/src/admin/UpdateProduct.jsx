@@ -76,10 +76,10 @@ const UpdateProduct = () => {
     }
   }, []);
 
-  const handleChange = (e, field) => {
-    const value = e.target.value;
-    setFormdata((prevFormData) => ({ ...prevFormData, [field]: value }));
-  };
+  // const handleChange = (e, field) => {
+  //   const value = e.target.value;
+  //   setFormdata((prevFormData) => ({ ...prevFormData, [field]: value }));
+  // };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -419,7 +419,7 @@ const UpdateProduct = () => {
                         className="hidden"
                         id="dropzone-file"
                         type="file"
-                        onChange={handleImageChange}
+                        onChange={(e) => handleChange(e, "file")}
                       />
                     </label>
                   </div>
