@@ -21,6 +21,7 @@ import ResetPassword from "./auth/ResetPassword";
 
 function App() {
   const dispatch = useDispatch();
+  
   useEffect(() => {
     dispatch(userSessionAsync());
   });

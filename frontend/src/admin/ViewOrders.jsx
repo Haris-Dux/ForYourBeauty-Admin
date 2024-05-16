@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { getAllOrdersAsync } from "../features/orderSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const data = [
   {
@@ -34,13 +36,40 @@ const data = [
 
 const ViewOrders = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredOrders, setFilteredOrders] = useState([]);
+
   const dropdownRef = useRef(null);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
+
+  const orders = useSelector((state) => state.order.orders);
+  console.log("orders", orders);
+
+  useEffect(() => {
+    dispatch(getAllOrdersAsync());
+  }, []);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredOrders(orders?.orders || []);
+    } else {
+      const filtered = orders?.orders?.filter((order) => {
+        const orderId = order.OrderID.toLowerCase();
+        const searchValue = searchQuery.toLowerCase();
+        return (
+          orderId.includes(searchValue) ||
+          orderId.includes(`FYB-${searchValue}`)
+        );
+      });
+      setFilteredOrders(filtered);
+    }
+  }, [searchQuery, orders]);
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -94,9 +123,11 @@ const ViewOrders = () => {
                     <input
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       id="simple-search"
-                      placeholder="Search"
+                      placeholder="Search by Id"
                       required
                       type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                 </form>
@@ -104,7 +135,7 @@ const ViewOrders = () => {
 
               <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
                 {/* DROPDOWN */}
-                <div ref={dropdownRef} className="relative">
+                {/* <div ref={dropdownRef} className="relative">
                   <button
                     className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                     id="filterDropdownButton"
@@ -153,213 +184,64 @@ const ViewOrders = () => {
                       </ul>
                     </div>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
 
             {/* TABLES */}
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400 border-b border-gray-400">
                   <tr>
-                    <th className="px-5 py-3" scope="col">
-                      Sr #
+                    <th className="px-5 py-4" scope="col">
+                      Sr
                     </th>
-                    <th className="px-7 py-3" scope="col">
-                      Name
+                    <th className="px-7 py-4" scope="col">
+                      Order ID
                     </th>
-                    <th className="px-7 py-3" scope="col">
-                      UserId
+                    <th className="px-7 py-4" scope="col">
+                      Date
                     </th>
-                    <th className="px-7 py-3" scope="col">
+                    <th className="px-7 py-4" scope="col">
                       Phone
                     </th>
-                    <th className="px-7 py-3" scope="col">
+                    <th className="px-7 py-4" scope="col">
                       Amount
                     </th>
-                    <th className="px-7 py-3" scope="col">
+                    <th className="px-7 py-4" scope="col">
                       Order Progress
                     </th>
-                    <th className="px-7 py-3" scope="col">
+                    <th className="px-7 py-4" scope="col">
                       <span className="sr-only">Actions</span>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.map((data, index) => (
+                  {filteredOrders.map((data, index) => (
                     <tr
                       key={index}
-                      onClick={() => handleOrderDetails(index + 1)}
+                      onClick={() => handleOrderDetails(data?.id)}
                       className="border-b dark:border-gray-700 cursor-pointer"
                     >
                       <th
-                        className="px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         scope="row"
                       >
                         {index + 1}
                       </th>
-                      <td className="px-7 py-3">{data.name}</td>
-                      <td className="px-7 py-3">{data.userId}</td>
-                      <td className="px-7 py-3">{data.phone}</td>
-                      <td className="px-7 py-3">{data.amount}</td>
-                      <td className="px-7 py-3">{data.order_progress}</td>
-                      <td className="px-7 py-3 flex items-center justify-end">
-                        <button
-                          className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
-                          data-dropdown-toggle="playstation-5-dropdown"
-                          id="playstation-5-dropdown-button"
-                          type="button"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                          </svg>
-                        </button>
-                        <div
-                          className="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
-                          id="playstation-5-dropdown"
-                        >
-                          <ul
-                            aria-labelledby="playstation-5-dropdown-button"
-                            className="py-1 text-sm text-gray-700 dark:text-gray-200"
-                          >
-                            <li>
-                              <a
-                                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                href="#"
-                              >
-                                Show
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                href="#"
-                              >
-                                Edit
-                              </a>
-                            </li>
-                          </ul>
-                          <div className="py-1">
-                            <a
-                              className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                              href="#"
-                            >
-                              Delete
-                            </a>
-                          </div>
-                        </div>
+                      <td className="px-7 py-4">{data.OrderID}</td>
+                      <td className="px-7 py-4">
+                        {new Date(data?.createdAt).toLocaleDateString()}
                       </td>
+                      <td className="px-7 py-4">{data.phone}</td>
+                      <td className="px-7 py-4">{data.totalAmount}</td>
+                      <td className="px-7 py-4">{data.orderProgress}</td>
+                      <td className="px-7 py-4 flex items-center justify-end"></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            {/* <nav
-              aria-label="Table navigation"
-              className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
-            >
-              <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                Showing
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  1-10
-                </span>
-                of
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  1000
-                </span>
-              </span>
-              <ul className="inline-flex items-stretch -space-x-px">
-                <li>
-                  <a
-                    className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    href="#"
-                  >
-                    <span className="sr-only">Previous</span>
-                    <svg
-                      aria-hidden="true"
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        clipRule="evenodd"
-                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                        fillRule="evenodd"
-                      />
-                    </svg>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    href="#"
-                  >
-                    1
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    href="#"
-                  >
-                    2
-                  </a>
-                </li>
-                <li>
-                  <a
-                    aria-current="page"
-                    className="flex items-center justify-center text-sm z-10 py-2 px-3 leading-tight text-primary-600 bg-primary-50 border border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                    href="#"
-                  >
-                    3
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    href="#"
-                  >
-                    ...
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    href="#"
-                  >
-                    100
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    href="#"
-                  >
-                    <span className="sr-only">Next</span>
-                    <svg
-                      aria-hidden="true"
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        clipRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        fillRule="evenodd"
-                      />
-                    </svg>
-                  </a>
-                </li>
-              </ul>
-            </nav> */}
           </div>
         </div>
       </section>

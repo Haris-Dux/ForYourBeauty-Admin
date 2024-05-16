@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 // import product from "./ProductData";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getAllOrdersAsync } from "../features/orderSlice";
 
 const data = [
   {
@@ -35,8 +37,17 @@ const data = [
 
 const AllProducts = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { isLoading } = useSelector((state) => state.product);
+
+  const orders = useSelector((state) => state.order.orders);
+  console.log("orders", orders);
+
+  useEffect(() => {
+    dispatch(getAllOrdersAsync());
+  }, []);
+
   // console.log('products', products);
 
   //   const handleUpdate = (id) => {
@@ -46,6 +57,11 @@ const AllProducts = () => {
 
   const handleOrderPage = () => {
     navigate(`/admin/view_orders`);
+    window.scroll(0, 0);
+  };
+
+  const handleOrderDetails = (id) => {
+    navigate(`/admin/orderDetail/${id}`);
     window.scroll(0, 0);
   };
 
@@ -172,15 +188,13 @@ const AllProducts = () => {
             </div>
 
             {/* ------------ SECOND STATS BAR ------------*/}
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4">
+            {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4">
               <div className="rounded-lg md:col-span-1 lg:col-span-4 xl:col-span-3">
-                {/* BAR CHARTS */}
                 <div className="h-72 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 w-full p-4">
                   Bar Chart
                 </div>
               </div>
 
-              {/* SALES BY LOCATION */}
               <div className="px-4 pt-5 lg:col-span-4 xl:col-span-1 pb-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 rounded-lg border border-gray-400 dark:border-gray-700">
                 <h2 className="mb-3 font-medium text-lg">Customer Reviews</h2>
                 <p className="text-sm">
@@ -190,111 +204,65 @@ const AllProducts = () => {
                   consequatur nihil impedit cumque non magnam hic.
                 </p>
               </div>
-            </div>
+            </div> */}
 
             {/* TABLES */}
-            <div className="mt-5 overflow-x-auto">
-              <h2 className="playfair mb-2 text-2xl font-bold text-gray-900 dark:text-gray-100">
-                New Orders
-              </h2>
-              <table
-                onClick={handleOrderPage}
-                className="w-full text-sm text-left bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400"
-              >
-                <thead className="text-xs text-gray-700 uppercase border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <div className="mt-12 overflow-x-auto ">
+              <div className=" header">
+                <h2 className="playfair mb-3 text-2xl dark:text-gray-100 font-semibold uppercase tracking-wider">
+                  Recent Orders
+                </h2>
+              </div>
+
+              <table className="w-full text-sm text-left  text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-100 tracking-wide border-b border-gray-400">
                   <tr>
-                    <th className="px-7 py-3" scope="col">
-                      Sr #
+                    <th className="px-5 py-4" scope="col">
+                      Sr
                     </th>
-                    <th className="px-7 py-3" scope="col">
-                      Name
+                    <th className="px-7 py-4" scope="col">
+                      Order ID
                     </th>
-                    <th className="px-7 py-3" scope="col">
-                      UserId
+                    <th className="px-7 py-4" scope="col">
+                      Date
                     </th>
-                    <th className="px-7 py-3" scope="col">
+                    <th className="px-7 py-4" scope="col">
                       Phone
                     </th>
-                    <th className="px-7 py-3" scope="col">
+                    <th className="px-7 py-4" scope="col">
                       Amount
                     </th>
-                    <th className="px-7 py-3" scope="col">
+                    <th className="px-7 py-4" scope="col">
                       Order Progress
                     </th>
-                    <th className="px-7 py-3" scope="col">
+                    <th className="px-7 py-4" scope="col">
                       <span className="sr-only">Actions</span>
                     </th>
                   </tr>
                 </thead>
-                <tbody className="">
-                  {data.map((data, index) => (
+
+                {/* Table Body */}
+                <tbody className="bg-gray-50 dark:bg-gray-800">
+                  {orders?.orders?.slice(0, 10).map((data, index) => (
                     <tr
                       key={index}
+                      onClick={() => handleOrderDetails(data?.id)}
                       className="border-b dark:border-gray-700 cursor-pointer"
                     >
                       <th
-                        className="px-7 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         scope="row"
                       >
                         {index + 1}
                       </th>
-                      <td className="px-7 py-3">{data.name}</td>
-                      <td className="px-7 py-3">{data.userId}</td>
-                      <td className="px-7 py-3">{data.phone}</td>
-                      <td className="px-7 py-3">{data.amount}</td>
-                      <td className="px-7 py-3">{data.order_progress}</td>
-                      {/* <td className="px-7 py-3 flex items-center justify-end">
-                        <button
-                          className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
-                          data-dropdown-toggle="playstation-5-dropdown"
-                          id="playstation-5-dropdown-button"
-                          type="button"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                          </svg>
-                        </button>
-                        <div
-                          className="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
-                          id="playstation-5-dropdown"
-                        >
-                          <ul
-                            aria-labelledby="playstation-5-dropdown-button"
-                            className="py-1 text-sm text-gray-700 dark:text-gray-200"
-                          >
-                            <li>
-                              <a
-                                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                href="#"
-                              >
-                                Show
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                href="#"
-                              >
-                                Edit
-                              </a>
-                            </li>
-                          </ul>
-                          <div className="py-1">
-                            <a
-                              className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                              href="#"
-                            >
-                              Delete
-                            </a>
-                          </div>
-                        </div>
-                      </td> */}
+                      <td className="px-7 py-4">{data.OrderID}</td>
+                      <td className="px-7 py-4">
+                        {new Date(data?.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-7 py-4">{data.phone}</td>
+                      <td className="px-7 py-4">{data.totalAmount}</td>
+                      <td className="px-7 py-4">{data.orderProgress}</td>
+                      <td className="px-7 py-4 flex items-center justify-end"></td>
                     </tr>
                   ))}
                 </tbody>

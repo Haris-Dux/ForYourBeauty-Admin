@@ -1,21 +1,6 @@
 import mongoose from "mongoose";
 import { generateUniqueOrderId } from "../utils/GenerateId.js";
 
-const orderProgressSchema = new mongoose.Schema({
-  status: {
-    type: String,
-    default: "Pending",
-    enum: ["Pending", "Dispatched", "Deliverd", "Cancelled"],
-  },
-  additionalNote: {
-    type: String,
-    default: null,
-  },
-  date: {
-    type: Date,
-    default: Date.now,
-  },
-});
 
 const orderSchema = new mongoose.Schema(
   {
@@ -44,7 +29,11 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
-    orderProgress: [orderProgressSchema],
+    orderProgress:{
+      type: String,
+      default:"Pending",
+      enum:['Pending','Deliverd','Dispatched','Cancelled']
+    } ,
     couponUsed: {
       code: { type: String },
       discount: { type: Number },

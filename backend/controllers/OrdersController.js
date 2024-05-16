@@ -3,8 +3,17 @@ import { setMongoose } from "../utils/Mongoose.js";
 
 export const createOrder = async (req, res, next) => {
   try {
-    const { items, name, userID, address, phone, totalAmount, OrderID , couponUsed} =
-      req.body;
+    const {
+      items,
+      name,
+      userID,
+      address,
+      phone,
+      totalAmount,
+      OrderID,
+      couponUsed,
+      orderProgress,
+    } = req.body;
     if (items.length === 0) {
       throw new Error("No Items In Cart");
     }
@@ -19,7 +28,8 @@ export const createOrder = async (req, res, next) => {
       phone,
       totalAmount,
       OrderID,
-      couponUsed
+      couponUsed,
+      orderProgress,
     });
     return res
       .status(201)
@@ -29,20 +39,17 @@ export const createOrder = async (req, res, next) => {
   }
 };
 
-export const updateOrder = async (data) => {
+export const updateOrder = async (req, res, next) => {
   try {
-    const { id, orderProgress, address, phone } = data;
+    const { id, orderProgress, address, phone } = req.body;
     let orderQuery = {};
     if (!id) {
       throw new Error("No ID Provided");
     }
-    const order = await OrdersModel.findOne(id);
+    const order = await OrdersModel.findOne({ _id: id });
+
     if (!order) {
       throw new Error("No Order Data Found");
-    }
-    //Remove It For Admin
-    if (order.status === "Dispatched") {
-      throw new Error("This Order has been already been Dispatched");
     }
     if (address) {
       orderQuery = { ...orderQuery, address };
@@ -50,9 +57,12 @@ export const updateOrder = async (data) => {
     if (phone) {
       orderQuery = { ...orderQuery, phone };
     }
+    console.log(id, orderProgress);
     if (orderProgress) {
-      updateQuery = { ...updateQuery, orderProgress };
+      orderQuery = { ...orderQuery, orderProgress };
     }
+    if (Object.keys(orderQuery).length === 0)
+      throw new Error("No fileds Updated");
     await OrdersModel.findByIdAndUpdate(id, orderQuery);
     return res.status(200).json({ message: "Order Data Updated" });
   } catch (error) {

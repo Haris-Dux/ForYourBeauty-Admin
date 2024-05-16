@@ -31,7 +31,7 @@ input::-webkit-inner-spin-button {
 body {
   --sb-track-color: #ffffff;
   --sb-thumb-color: #494949;
-  --sb-size: 8px;
+  --sb-size: 7px;
 }
 
 body::-webkit-scrollbar {

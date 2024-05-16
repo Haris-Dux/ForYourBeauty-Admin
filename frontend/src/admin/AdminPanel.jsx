@@ -342,7 +342,7 @@ const AdminBody = () => {
               </li>
 
               {/* REVIEWS */}
-              <li>
+              {/* <li>
                 <Link
                   to="/admin/reviews"
                   onClick={handleMoveToTop}
@@ -367,7 +367,7 @@ const AdminBody = () => {
                   )}
                   <span className="ml-3">Reviews</span>
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
           <div className="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-gray-50 dark:bg-gray-800 z-20">
