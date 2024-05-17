@@ -9,15 +9,18 @@ const initialState = {
 };
 
 //API URL
-const getAllOrdersUrl = "http://localhost:8080/api/orders/getAllOrders";
+const getAllOrdersUrl = `http://localhost:8080/api/orders/getAllOrders`;
 const updateOrdersUrl = "http://localhost:8080/api/orders/updateOrder";
 
 export const getAllOrdersAsync = createAsyncThunk(
   "coupon/getallOrders",
-  async () => {
+  async (data) => {
+    const searchQuery =
+    data?.search !== undefined && data?.search !== null
+      ? `&search=${data?.search}`
+      : "";
     try {
-      const response = await axios.post(getAllOrdersUrl);
-      // toast.success(response.data.message);
+      const response = await axios.post(`${getAllOrdersUrl}?status=${data.status}&page=${data.page}${searchQuery}`);
       console.log(response.data);
       return response.data;
     } catch (error) {

@@ -1,38 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { getAllOrdersAsync } from "../features/orderSlice";
 import { useDispatch, useSelector } from "react-redux";
-
-const data = [
-  {
-    name: "Suheer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Haris",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Umer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Suheer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-];
+import { HttpStatusCode } from "axios";
 
 const ViewOrders = () => {
   const navigate = useNavigate();
@@ -47,29 +17,15 @@ const ViewOrders = () => {
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
+  const [searchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page")) || 1;
+  const status = searchParams.get("status") || "All";
 
   const orders = useSelector((state) => state.order.orders);
-  console.log("orders", orders);
 
   useEffect(() => {
-    dispatch(getAllOrdersAsync());
-  }, []);
-
-  useEffect(() => {
-    if (!searchQuery) {
-      setFilteredOrders(orders?.orders || []);
-    } else {
-      const filtered = orders?.orders?.filter((order) => {
-        const orderId = order.OrderID.toLowerCase();
-        const searchValue = searchQuery.toLowerCase();
-        return (
-          orderId.includes(searchValue) ||
-          orderId.includes(`FYB-${searchValue}`)
-        );
-      });
-      setFilteredOrders(filtered);
-    }
-  }, [searchQuery, orders]);
+    dispatch(getAllOrdersAsync({ status, page }));
+  }, [dispatch, status, page]);
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -89,6 +45,65 @@ const ViewOrders = () => {
     window.scroll(0, 0);
   };
 
+  const renderPaginationLinks = () => {
+    const totalPages = orders?.totalPages;
+    console.log(totalPages);
+    const paginationLinks = [];
+    for (let i = 1; i <= totalPages; i++) {
+      paginationLinks.push(
+        <li key={i}>
+          <Link
+            to={`/admin/view_orders?status=${status}&page=${i}`}
+            className={`flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 ${
+              i === page ? "bg-gray-200" : "hover:bg-gray-100"
+            }`}
+            onClick={() => dispatch(getAllOrdersAsync({ status, page: i }))}
+          >
+            {i}
+          </Link>
+        </li>
+      );
+    }
+    return paginationLinks;
+  };
+
+  const handleSearch = (e) => {
+    const query = e.target.value.trim();
+    setSearchQuery(query);
+  };
+
+  useEffect(() => {
+    if (searchQuery) {
+      const timer = setTimeout(() => {
+        dispatch(getAllOrdersAsync({ status: "All", search: searchQuery }));
+      }, 500);
+      return () => clearTimeout(timer);
+    } else if (searchQuery !== undefined && searchQuery !== null) {
+      dispatch(getAllOrdersAsync({ status, page }));
+    }
+  }, [dispatch, page, status, searchQuery]);
+
+  const statusData = ["Pending", "Deliverd", "Dispatched", "Cancelled"];
+
+  const handleStatusChange = (status) => {
+    navigate(`/admin/view_orders?status=${status}`);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Pending":
+        return "text-yellow-500";
+      case "Delivered":
+        return "text-green-500";
+      case "Dispatched":
+        return "text-blue-500";
+      case "Cancelled":
+        return "text-red-500";
+      default:
+        return "text-gray-700";
+    }
+  };
+
   return (
     <>
       <section className="bg-[#E5E5E5] dark:bg-gray-900 min-h-screen py-8 sm:py-10">
@@ -96,7 +111,7 @@ const ViewOrders = () => {
           <h2 className="mb-5 playfair text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
             View Orders
           </h2>
-
+        <>
           <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
             <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
               <div className="w-full md:w-1/2">
@@ -123,11 +138,10 @@ const ViewOrders = () => {
                     <input
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       id="simple-search"
-                      placeholder="Search by Id"
-                      required
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="search order Id"
+                      type="search"
+                      defaultValue={searchQuery}
+                      onChange={handleSearch}
                     />
                   </div>
                 </form>
@@ -135,14 +149,14 @@ const ViewOrders = () => {
 
               <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
                 {/* DROPDOWN */}
-                {/* <div ref={dropdownRef} className="relative">
+                <div ref={dropdownRef} className="relative">
                   <button
                     className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                     id="filterDropdownButton"
                     type="button"
                     onClick={toggleDropdown}
                   >
-                    Sort By
+                    Sort By Status
                     <svg
                       aria-hidden="true"
                       className={`-mr-1 ml-1.5 w-5 h-5 transform ${
@@ -169,22 +183,21 @@ const ViewOrders = () => {
                         aria-labelledby="filterDropdownButton"
                         className="text-sm"
                       >
-                        <li className="px-3 py-2.5 flex items-center text-gray-900 dark:text-gray-100 dark:hover:bg-gray-600 hover:bg-gray-200 cursor-pointer">
-                          Pending
-                        </li>
-                        <li className="px-3 py-2.5 flex items-center text-gray-900 dark:text-gray-100 dark:hover:bg-gray-600 hover:bg-gray-200 cursor-pointer">
-                          Dispatched
-                        </li>
-                        <li className="px-3 py-2.5 flex items-center text-gray-900 dark:text-gray-100 dark:hover:bg-gray-600 hover:bg-gray-200 cursor-pointer">
-                          Deliverd
-                        </li>
-                        <li className="px-3 py-2.5 flex items-center text-gray-900 dark:text-gray-100 dark:hover:bg-gray-600 hover:bg-gray-200 cursor-pointer">
-                          Cancelled
-                        </li>
+                        {statusData.map((item) => (
+                          <li
+                            li
+                            key={item}
+                            value={item}
+                            onClick={() => handleStatusChange(item)}
+                            className="px-3 py-2.5 flex items-center text-gray-900 dark:text-gray-100 dark:hover:bg-gray-600 hover:bg-gray-200 cursor-pointer"
+                          >
+                            {item}
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   )}
-                </div> */}
+                </div>
               </div>
             </div>
 
@@ -216,8 +229,8 @@ const ViewOrders = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
-                  {filteredOrders.map((data, index) => (
+              {orders?.orders?.length > 0 ? (  <tbody>
+                  {orders?.orders?.map((data, index) => (
                     <tr
                       key={index}
                       onClick={() => handleOrderDetails(data?.id)}
@@ -235,14 +248,138 @@ const ViewOrders = () => {
                       </td>
                       <td className="px-7 py-4">{data.phone}</td>
                       <td className="px-7 py-4">{data.totalAmount}</td>
-                      <td className="px-7 py-4">{data.orderProgress}</td>
+                      <td
+                        className={`px-7 py-4 text-md font-medium ${getStatusColor(
+                          data?.orderProgress
+                        )}`}
+                      >
+                        {data.orderProgress}
+                      </td>
                       <td className="px-7 py-4 flex items-center justify-end"></td>
                     </tr>
                   ))}
-                </tbody>
+                </tbody>) : (
+                 <tbody>
+                 <tr>
+                   <td colSpan="7" className="text-center py-4">
+                     <div className="playfair text-xl font-medium uppercase">
+                       No Orders
+                     </div>
+                   </td>
+                 </tr>
+               </tbody>
+              )}
               </table>
             </div>
           </div>
+
+         
+            <div className="flex justify-center">
+              <nav aria-label="Page navigation example">
+                <ul className="flex items-center -space-x-px h-8 py-10 text-sm">
+                  <li>
+                    {orders?.page > 1 ? (
+                      <Link
+                        to={`/admin/view_orders?status=${status}&page=${
+                          page - 1
+                        }`}
+                        className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                      >
+                        <span className="sr-only">Previous</span>
+                        <svg
+                          className="w-2.5 h-2.5 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 6 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 1 1 5l4 4"
+                          />
+                        </svg>
+                      </Link>
+                    ) : (
+                      <button
+                        className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg cursor-not-allowed"
+                        disabled
+                      >
+                        <span className="sr-only">Previous</span>
+                        <svg
+                          className="w-2.5 h-2.5 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 6 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 1 1 5l4 4"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </li>
+                  {renderPaginationLinks()}
+                  <li>
+                    {orders?.totalPages !== page ? (
+                      <Link
+                        to={`/admin/view_orders?status=${status}&page=${
+                          page + 1
+                        }`}
+                        className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                      >
+                        <span className="sr-only">Next</span>
+                        <svg
+                          className="w-2.5 h-2.5 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 6 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="m1 9 4-4-4-4"
+                          />
+                        </svg>
+                      </Link>
+                    ) : (
+                      <button
+                        className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg cursor-not-allowed"
+                        disabled
+                      >
+                        <span className="sr-only">Next</span>
+                        <svg
+                          className="w-2.5 h-2.5 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 6 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="m1 9 4-4-4-4"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </>
         </div>
       </section>
     </>

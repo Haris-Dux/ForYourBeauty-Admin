@@ -9,10 +9,10 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
 
   // Getting all coupons
   const coupons = useSelector((state) => state.coupons.coupon);
+  const isLoading = useSelector((state) => state.coupons.isLoading);
 
   // Selected coupon
   const selectedCoupon = coupons.filter((data) => data.id === updatedCouponId);
-  console.log("selectedCoupon", selectedCoupon);
 
   const [updateFormData, setUpdateFormData] = useState({
     code: "",
@@ -32,7 +32,7 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
         expiresAt: coupon.expiresAt || "",
         discountAmount: coupon.discountAmount || "",
         total_limit: coupon.total_limit || "",
-        categories: coupon.categories[0] || "",
+        categories: coupon.categories || "",
         allProducts: coupon.allProducts || false,
         isActive: coupon.isActive || false,
       });
@@ -49,7 +49,6 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
     e.preventDefault();
 
     if (updateFormData.allProducts) {
-      updatedData.category = "";
       dispatch(
         updateCoupunAsync({ id: updatedCouponId, ...updateFormData })
       ).then((res) => {
@@ -57,6 +56,7 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
           dispatch(getAllCoupunAsync());
         }
         setOpenModal(false);
+        selectedCoupon = null
       });
     } else if (
       updateFormData.allProducts === false &&
@@ -72,6 +72,7 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
           dispatch(getAllCoupunAsync());
         }
         setOpenModal(false);
+        selectedCoupon = null
       });
     }
   };
@@ -278,12 +279,16 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
               </div>
 
               <div className="mt-8 flex items-center space-x-4">
-                <button
-                  type="submit"
-                  className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                >
-                  Update Coupon
-                </button>
+                {isLoading ? (
+                  <div className="loader-pink"></div>
+                ) : (
+                  <button
+                    type="submit"
+                    className="text-white cursor-pointer bg-[#EC72AF] hover:bg-[#d64c91] focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-[#EC72AF] dark:hover:bg-[#EC72AF] dark:focus:ring-[#EC72AF]"
+                  >
+                    Update Coupon
+                  </button>
+                )}
               </div>
             </form>
           </div>

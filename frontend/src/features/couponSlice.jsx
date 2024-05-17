@@ -47,8 +47,6 @@ export const getAllCoupunAsync = createAsyncThunk(
   async () => {
     try {
       const response = await axios.post(getAllCoupunUrl);
-      // toast.success(response.data.message);
-      // console.log(response.data);
       return response.data;
     } catch (error) {
       toast.error(error.response.data.error);
@@ -92,13 +90,12 @@ const couponSlice = createSlice({
         state.coupon = action.payload;
       })
 
-      // .addCase(updateCoupunAsync.pending, (state, action) => {
-      //   state.isLoading = true;
-      // })
-      // .addCase(updateCoupunAsync.fulfilled, (state, action) => {
-      //   state.isLoading = false;
-      //   state.coupon = action.payload۔;
-      // });
+      .addCase(updateCoupunAsync.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(updateCoupunAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+      });
   },
 });
 

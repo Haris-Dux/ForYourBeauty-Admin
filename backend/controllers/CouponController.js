@@ -60,9 +60,10 @@ export const updateCoupon = async (req, res, next) => {
       expiresAt,
       allProducts,
       categories,
-      code
+      code,
     } = req.body;
     if (!id) throw new Error("Coupon Id not found");
+    const coupon = await CouponModel.findById(id);
     let updateQuery = {};
     if (discountAmount) {
       updateQuery = { ...updateQuery, discountAmount };
@@ -79,11 +80,16 @@ export const updateCoupon = async (req, res, next) => {
     if (expiresAt) {
       updateQuery = { ...updateQuery, expiresAt };
     }
-    if (allProducts !== undefined) {
-      updateQuery = { ...updateQuery, allProducts };
-    }
-    if (categories !== undefined) {
+    if (categories && categories !== coupon.categories) {
       updateQuery = { ...updateQuery, categories };
+      updateQuery.allProducts = null;
+    }
+    if (allProducts !== undefined && allProducts !== coupon.allProducts) {
+      updateQuery = { ...updateQuery, allProducts };
+      if (allProducts) {
+        coupon.categories = null;
+        updateQuery.categories = null;
+      }
     }
     if (Object.keys(updateQuery).length === 0)
       throw new Error("No fields To Update");

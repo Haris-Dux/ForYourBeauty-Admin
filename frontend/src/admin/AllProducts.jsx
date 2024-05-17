@@ -82,9 +82,6 @@ const AllProducts = () => {
     setSearchQuery(query);
   };
 
-  const disabled = products?.page === products?.totalPages;
-  console.log(disabled);
-
   return (
     <>
       {isLoading ? (
