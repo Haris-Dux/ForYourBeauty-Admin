@@ -18,10 +18,12 @@ import VerifyOtp from "./auth/VerifyOtp";
 import CreateCoupon from "./admin/CreateCoupon";
 import Reviews from "./admin/Reviews";
 import ResetPassword from "./auth/ResetPassword";
+import ContactQueries from "./admin/ContactQueries";
+import QueryDisplay from "./admin/QueryDisplay";
 
 function App() {
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     dispatch(userSessionAsync());
   });
@@ -48,6 +50,8 @@ function App() {
             <Route path="orderDetail/:id" element={<OrderDetailPage />} />
             <Route path="create_coupon" element={<CreateCoupon />} />
             <Route path="reviews" element={<Reviews />} />
+            <Route path="contact_queries" element={<ContactQueries />} />
+            <Route path="client-message/:id" element={<QueryDisplay />} />
           </Route>
         </Routes>
         <Toaster />

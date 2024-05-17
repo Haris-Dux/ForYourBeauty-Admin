@@ -4,19 +4,19 @@ import axios from "axios";
 
 // INITIAL STATE
 const initialState = {
-  orders: [],
+  reviews: [],
   isLoading: false,
 };
 
 //API URL
-const getAllReviewsByProductUrl = "http://localhost:8080/api/reviews/getAllReviewsByProduct";
-const updateOrdersUrl = "http://localhost:8080/api/orders/updateOrder";
+const getAllReviewsUrl = "http://localhost:8080/api/reviews/getAllReviews";
+const deleteReviewsUrl = "http://localhost:8080/api/reviews/deleteReview";
 
-export const getAllOrdersAsync = createAsyncThunk(
-  "coupon/getallOrders",
+export const getAllReviewsAsync = createAsyncThunk(
+  "reviews/getallreviews",
   async () => {
     try {
-      const response = await axios.post(getAllOrdersUrl);
+      const response = await axios.post(getAllReviewsUrl);
       // toast.success(response.data.message);
       console.log(response.data);
       return response.data;
@@ -26,11 +26,11 @@ export const getAllOrdersAsync = createAsyncThunk(
   }
 );
 
-export const updateOrdersAsync = createAsyncThunk(
-  "coupon/updateCoupon",
-  async (data) => {
+export const deleteReviewsAsync = createAsyncThunk(
+  "reviews/deleteReview",
+  async (id) => {
     try {
-      const response = await axios.post(updateOrdersUrl, data);
+      const response = await axios.post(deleteReviewsUrl, id);
       toast.success(response.data.message);
       console.log(response.data);
       return response.data;
@@ -48,13 +48,12 @@ const reviewSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // signup
-      .addCase(getAllOrdersAsync.pending, (state, action) => {
+      .addCase(getAllReviewsAsync.pending, (state, action) => {
         state.isLoading = true;
       })
-      .addCase(getAllOrdersAsync.fulfilled, (state, action) => {
+      .addCase(getAllReviewsAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orders = action.payload;
+        state.reviews = action.payload;
       });
   },
 });

@@ -6,7 +6,7 @@ export const deleteReview = async (req,res,next) => {
         const { id } = req.body;
         if(!id) throw new Error("Review Id Not Found")
         await reviewsAndRatings.findByIdAndDelete(id);
-        return res.status(201).json({ message: "Review updated successfully" });
+        return res.status(201).json({ message: "Review deleted successfully" });
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
