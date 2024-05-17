@@ -229,27 +229,30 @@ const AllProducts = () => {
                 <>
                   <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {products?.productData?.map((data) => (
-                      <li key={data?.id} onClick={() => handleUpdate(data?.id)}>
-                        <div className="group block overflow-hidden cursor-pointer">
-                          <img
-                            src={data?.image?.downloadURL}
-                            alt=""
-                            className="h-[350px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[450px]"
-                          />
-
-                          <div className="relative bg-white pt-3">
-                            <h3 className="text-xs text-gray-700 group-hover:underline group-hover:underline-offset-4">
-                              {data?.name}
-                            </h3>
-
-                            <p className="mt-2">
-                              <span className="sr-only"> Regular Price </span>
-
-                              <span className="tracking-wider text-gray-900">
-                                {" "}
-                                Rs. {data?.price}{" "}
-                              </span>
-                            </p>
+                      <li className="w-[300px] rounded-md border bg-white">
+                        <img
+                          src={data?.image?.downloadURL}
+                          alt="Laptop"
+                          className="h-[250px] w-full rounded-t-md object-cover"
+                        />
+                        <div className="p-4">
+                          <h1 className="inline-flex items-center text-lg font-semibold">
+                            {data?.name}
+                          </h1>
+                          <p className="mt-3 text-sm text-gray-600">
+                            Lorem ipsum dolor sit amet consectetur adipisicing
+                            elit. Excepturi, debitis?
+                          </p>
+                          <div className="mt-4">
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-semibold text-gray-900">
+                              #Macbook
+                            </span>
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-semibold text-gray-900">
+                              #Apple
+                            </span>
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-semibold text-gray-900">
+                              #Laptop
+                            </span>
                           </div>
                         </div>
                       </li>

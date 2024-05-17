@@ -18,7 +18,7 @@ export const getAllQueriesAsync = createAsyncThunk(
     try {
       const response = await axios.post(getAllContactQueriesUrl);
       // toast.success(response.data.message);
-      console.log(response.data);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
       toast.error(error.response.data.error);

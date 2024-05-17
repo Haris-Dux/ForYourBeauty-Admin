@@ -18,7 +18,7 @@ export const getAllReviewsAsync = createAsyncThunk(
     try {
       const response = await axios.post(getAllReviewsUrl);
       // toast.success(response.data.message);
-      console.log(response.data);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
       toast.error(error.response.data.error);
@@ -32,7 +32,7 @@ export const deleteReviewsAsync = createAsyncThunk(
     try {
       const response = await axios.post(deleteReviewsUrl, id);
       toast.success(response.data.message);
-      console.log(response.data);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
       toast.error(error.response.data.error);
