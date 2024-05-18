@@ -229,7 +229,7 @@ const AllProducts = () => {
                 <>
                   <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {products?.productData?.map((data) => (
-                      <li className="w-[300px] rounded-md border bg-white">
+                      <li className="w-[300px] rounded-md border bg-gray-200">
                         <img
                           src={data?.image?.downloadURL}
                           alt="Laptop"
@@ -239,19 +239,47 @@ const AllProducts = () => {
                           <h1 className="inline-flex items-center text-lg font-semibold">
                             {data?.name}
                           </h1>
-                          <p className="mt-3 text-sm text-gray-600">
-                            Lorem ipsum dolor sit amet consectetur adipisicing
-                            elit. Excepturi, debitis?
-                          </p>
+                          {data.sale_price ? (
+                            <div className="flex items-center gap-x-2">
+                              <h1 className="items-center text-lg font-semibold">
+                                Rs. {data?.sale_price}
+                              </h1>
+                              <h1 className="items-center line-through text-md font-semibold">
+                                {data?.price}
+                              </h1>
+                            </div>
+                          ) : (
+                            <h1 className="items-center text-lg font-semibold">
+                              Rs. {data?.price}
+                            </h1>
+                          )}
+
+                          {data?.stock === 0 ? (
+                            <h1
+                              className={`items-center px-3 py-2 my-2 rounded-lg bg-red-600 text-white text-sm font-semibold`}
+                            >
+                              Out of Stock
+                            </h1>
+                          ) : (
+                            <h1
+                              className={` ${
+                                data?.stock <= 10
+                                  ? "text-red-600"
+                                  : "text-gray-800"
+                              } items-center text-sm font-semibold`}
+                            >
+                              Stock: {data?.stock}
+                            </h1>
+                          )}
                           <div className="mt-4">
-                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-semibold text-gray-900">
-                              #Macbook
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-gray-900">
+                              {data?.category}
                             </span>
-                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-semibold text-gray-900">
-                              #Apple
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-gray-900">
+                              {data?.subCategory}
                             </span>
-                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-semibold text-gray-900">
-                              #Laptop
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-white px-4 py-1 text-[11px] font-semibold text-gray-900">
+                              {new Date(data?.createdAt).toLocaleDateString()}
                             </span>
                           </div>
                         </div>
