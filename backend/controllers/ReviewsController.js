@@ -29,7 +29,7 @@ export const getAllReviews = async (req, res, next) => {
       page,
       reviewsData,
     };
-
+    setMongoose();
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ error: true, message:error.message });
