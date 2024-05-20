@@ -368,6 +368,34 @@ const AdminBody = () => {
                   <span className="ml-3">Reviews</span>
                 </Link>
               </li>
+
+              {/* REVIEWS */}
+              <li>
+                <Link
+                  to="/admin/contact_queries"
+                  onClick={handleMoveToTop}
+                  className={`h-14 pl-4 border-t flex items-center p-2 text-base font-medium ${
+                    location.pathname === "/admin/contact_queries"
+                      ? "bg-[#EC72AF] text-white dark:bg-gray-600 dark:text-gray-100 dark:border-gray-400"
+                      : "bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100"
+                  } group`}
+                >
+                  {theme === "dark" ? (
+                    <img
+                      className="w-5"
+                      src="https://cdn.shopify.com/s/files/1/0852/5099/8550/files/Mask_group_c04055e3-0578-40f8-87cc-8b38533fe552.png?v=1714764665"
+                      alt="side_bar_img"
+                    />
+                  ) : (
+                    <img
+                      className="w-5"
+                      src="https://cdn.shopify.com/s/files/1/0852/5099/8550/files/image_5.png?v=1714764984"
+                      alt="side_bar_img"
+                    />
+                  )}
+                  <span className="ml-3">Contact Queries</span>
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-gray-50 dark:bg-gray-800 z-20">
