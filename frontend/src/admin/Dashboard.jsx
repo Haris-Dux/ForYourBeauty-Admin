@@ -1,59 +1,117 @@
 import { useNavigate } from "react-router-dom";
 // import product from "./ProductData";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getAllOrdersAsync } from "../features/orderSlice";
-
-const data = [
-  {
-    name: "Suheer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Haris",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Umer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-  {
-    name: "Suheer",
-    userId: "8923023",
-    phone: "03123516584",
-    amount: "6650",
-    order_progress: "Dispatach",
-  },
-];
+import {
+  SalesStatisticsAsync,
+  getOrderCountsByMonthsAsync,
+  getOrderProgressAsync,
+  monthlyOrdersAsync,
+} from "../features/DashBoardSlice";
+import { Doughnut, Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
 
 const AllProducts = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { isLoading } = useSelector((state) => state.product);
-
+  const  isLoading  = useSelector((state) => state.product.isLoading);
+  const salesData = useSelector((state) => state.dashboard.SalesStatistics);
+  const ordersData = useSelector((state) => state.dashboard.monthlyOrders);
+  const orderProgress = useSelector((state) => state.dashboard.OrderProgress);
+  const monthlyOrdersData = useSelector((state) => state.dashboard.OrdersByMonth);
   const orders = useSelector((state) => state.order.orders);
-  console.log("orders", orders);
+
+  const page =  1;
+  const status = "Pending";
 
   useEffect(() => {
-    dispatch(getAllOrdersAsync());
+    dispatch(getAllOrdersAsync({ status, page }));
+  }, [dispatch, status, page]);
+
+
+  useEffect(() => {
+    dispatch(SalesStatisticsAsync());
+    dispatch(monthlyOrdersAsync());
+    dispatch(getOrderProgressAsync());
+    dispatch(getOrderCountsByMonthsAsync());
   }, []);
 
-  // console.log('products', products);
+  ChartJS.register(
+    ArcElement,
+    Tooltip,
+    Legend,
+    BarElement,
+    CategoryScale,
+    LinearScale
+  );
 
-  //   const handleUpdate = (id) => {
-  //     navigate(`/admin/update_product/${id}`);
-  //     window.scroll(0, 0);
-  //   };
+  const chartData = {
+    labels: ["Pending", "Delivered", "Dispatched", "Cancelled"],
+    datasets: [
+      {
+        label: "%",
+        data: [
+          orderProgress?.Pending || 0,
+          orderProgress?.Delivered || 0,
+          orderProgress?.Dispatched || 0,
+          orderProgress?.Cancelled || 0,
+        ],
+        backgroundColor: [
+          "rgb(205, 120, 3)",
+          "rgb(74, 165, 123)",
+          "rgb(63, 131, 248)",
+          "rgb(242, 82, 82)",
+        ],
+        borderColor: [
+          "rgb(205, 120, 3)",
+          "rgb(74, 165, 123)",
+          "rgb(63, 131, 248)",
+          "rgb(242, 82, 82)",
+        ],
+        borderWidth: 1,
+        borderRadius: 5,
+        spacing: 5,
+        cutout: 0,
+      },
+    ],
+  };
+
+  const barChartData = {
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+    datasets: [
+      {
+        label: "Orders",
+        data: monthlyOrdersData ? Object.values(monthlyOrdersData) : [],
+        backgroundColor: "rgb(255, 241, 247)",
+        borderColor: "rgb(236, 114, 175)",
+        borderWidth: 1,
+        borderRadius: 3
+      },
+    ],
+  };
 
   const handleOrderPage = () => {
     navigate(`/admin/view_orders`);
@@ -89,7 +147,7 @@ const AllProducts = () => {
                 fill="currentFill"
               />
             </svg>
-            <span className="sr-only">Loading...</span>
+            <div className="loader-pink"></div>
           </div>
         </>
       ) : (
@@ -109,13 +167,13 @@ const AllProducts = () => {
 
                 <div className="stat_data">
                   <h3 className="text-gray-900 dark:text-gray-100 mt-1.5 text-md font-normal">
-                    Total Sale
+                    Total Sales
                   </h3>
                   <h2 className="text-gray-900 dark:text-gray-100 mt-1.5 text-2xl font-semibold">
-                    232,789
+                    {salesData?.totalSales}
                   </h2>
                   <p className="text-gray-900 mt-1.5 bg-[#FDEDF5] text-sm px-3 py-1 w-16 rounded-lg">
-                    +1.5k
+                    {salesData?.salesDifference}
                   </p>
                 </div>
               </div>
@@ -131,14 +189,14 @@ const AllProducts = () => {
 
                 <div className="stat_data">
                   <h3 className="text-gray-900 dark:text-gray-100 mt-1.5 text-md font-normal">
-                    Total Sale
+                    Last Month
                   </h3>
                   <h2 className="text-gray-900 dark:text-gray-100 mt-1.5 text-2xl font-semibold">
-                    232,789
+                    {salesData?.lastMonthSales}
                   </h2>
-                  <p className="text-gray-900 mt-1.5 bg-[#FDEDF5] text-sm px-3 py-1 w-16 rounded-lg">
+                  {/* <p className="text-gray-900 mt-1.5 bg-[#FDEDF5] text-sm px-3 py-1 w-16 rounded-lg">
                     +1.5k
-                  </p>
+                  </p> */}
                 </div>
               </div>
               {/* THIRD BOX */}
@@ -146,21 +204,21 @@ const AllProducts = () => {
                 <div className="img">
                   <img
                     className="w-20"
-                    src="https://cdn.shopify.com/s/files/1/0852/5099/8550/files/Group_72065.png?v=1714765889"
+                    src="https://cdn.shopify.com/s/files/1/0852/5099/8550/files/Group_230.png?v=1714765888"
                     alt=""
                   />
                 </div>
 
                 <div className="stat_data">
                   <h3 className="text-gray-900 dark:text-gray-100 mt-1.5 text-md font-normal">
-                    Total Sale
+                    This Month
                   </h3>
                   <h2 className="text-gray-900 dark:text-gray-100 mt-1.5 text-2xl font-semibold">
-                    232,789
+                    {salesData?.currentMonthSales}
                   </h2>
-                  <p className="text-gray-900 mt-1.5 bg-[#FDEDF5] text-sm px-3 py-1 w-16 rounded-lg">
+                  {/* <p className="text-gray-900 mt-1.5 bg-[#FDEDF5] text-sm px-3 py-1 w-16 rounded-lg">
                     +1.5k
-                  </p>
+                  </p> */}
                 </div>
               </div>
               {/* FORTH BOX */}
@@ -175,36 +233,35 @@ const AllProducts = () => {
 
                 <div className="stat_data">
                   <h3 className="text-gray-900 dark:text-gray-100 mt-1.5 text-md font-normal">
-                    Total Sale
+                    Orders
                   </h3>
                   <h2 className="text-gray-900 dark:text-gray-100 mt-1.5 text-2xl font-semibold">
-                    232,789
+                    {ordersData?.TotalOrders}
                   </h2>
                   <p className="text-gray-900 mt-1.5 bg-[#FDEDF5] text-sm px-3 py-1 w-16 rounded-lg">
-                    +1.5k
+                    +{ordersData?.currentMonthOrders}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* ------------ SECOND STATS BAR ------------*/}
-            {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4">
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4">
               <div className="rounded-lg md:col-span-1 lg:col-span-4 xl:col-span-3">
                 <div className="h-72 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 w-full p-4">
-                  Bar Chart
+                  <Bar
+                    data={barChartData}
+                    options={{ responsive: true, maintainAspectRatio: false }}
+                  />
                 </div>
               </div>
 
-              <div className="px-4 pt-5 lg:col-span-4 xl:col-span-1 pb-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 rounded-lg border border-gray-400 dark:border-gray-700">
-                <h2 className="mb-3 font-medium text-lg">Customer Reviews</h2>
-                <p className="text-sm">
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                  Commodi tenetur aliquam obcaecati molestiae, debitis dolores
-                  quae quasi exercitationem iusto, sequi hic? Veniam,
-                  consequatur nihil impedit cumque non magnam hic.
-                </p>
+              <div className=" pt-5 lg:col-span-5 xl:col-span-1  bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 rounded-lg border border-gray-400 dark:border-gray-700">
+                <div>
+                  <Doughnut data={chartData} options={{ responsive: true }} />
+                </div>
               </div>
-            </div> */}
+            </div>
 
             {/* TABLES */}
             <div className="mt-12 overflow-x-auto ">
@@ -261,7 +318,7 @@ const AllProducts = () => {
                       </td>
                       <td className="px-7 py-4">{data.phone}</td>
                       <td className="px-7 py-4">{data.totalAmount}</td>
-                      <td className="px-7 py-4">{data.orderProgress}</td>
+                      <td className="px-7 py-4 text-[#BB6D00]">{data.orderProgress}</td>
                       <td className="px-7 py-4 flex items-center justify-end"></td>
                     </tr>
                   ))}

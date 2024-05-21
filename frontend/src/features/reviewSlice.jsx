@@ -9,19 +9,17 @@ const initialState = {
 };
 
 //API URL
-const getAllReviewsUrl = "http://localhost:8080/api/reviews/getAllReviews";
-const deleteReviewsUrl = "http://localhost:8080/api/reviews/deleteReview";
+const getAllReviewsUrl = `http://localhost:8080/api/reviews/getAllReviews`;
+const deleteReviewsUrl = `http://localhost:8080/api/reviews/deleteReview`;
 
 export const getAllReviewsAsync = createAsyncThunk(
   "reviews/getallreviews",
-  async () => {
+  async (page) => {
     try {
-      const response = await axios.post(getAllReviewsUrl);
-      // toast.success(response.data.message);
-      // console.log(response.data);
+      const response = await axios.post(`${getAllReviewsUrl}?page=${page}`);
       return response.data;
     } catch (error) {
-      toast.error(error.response.data.error);
+      throw new Error(error);
     }
   }
 );
@@ -32,7 +30,6 @@ export const deleteReviewsAsync = createAsyncThunk(
     try {
       const response = await axios.post(deleteReviewsUrl, id);
       toast.success(response.data.message);
-      // console.log(response.data);
       return response.data;
     } catch (error) {
       toast.error(error.response.data.error);

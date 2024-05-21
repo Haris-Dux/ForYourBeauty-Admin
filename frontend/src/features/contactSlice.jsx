@@ -10,18 +10,16 @@ const initialState = {
 
 //API URL
 const getAllContactQueriesUrl =
-  "http://localhost:8080/api/contact/getAllContacts";
+  `http://localhost:8080/api/contact/getAllContacts`;
 
 export const getAllQueriesAsync = createAsyncThunk(
   "contact/getallcontact",
   async () => {
     try {
       const response = await axios.post(getAllContactQueriesUrl);
-      // toast.success(response.data.message);
-      // console.log(response.data);
       return response.data;
     } catch (error) {
-      toast.error(error.response.data.error);
+      throw new Error(error)
     }
   }
 );
