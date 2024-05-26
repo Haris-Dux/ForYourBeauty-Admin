@@ -5,6 +5,7 @@ import axios from "axios";
 // INITIAL STATE
 const initialState = {
   products: [],
+  singleProduct:null,
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -17,7 +18,8 @@ const initialState = {
 //API URL
 const getProductsUrl = `http://localhost:8080/api/products/getProducts`;
 const createProductUrl = "http://localhost:8080/api/products/addProduct";
-const updateProductUrl = "http://localhost:8000/api/products/updateProduct";
+const updateProductUrl = "http://localhost:8080/api/products/updateProduct";
+const getsingleProductUrl = "http://localhost:8080/api/products/getProductById";
 // const deleteProductUrl = "http://localhost:4000/api/products/deleteProduct";
 // const getLatestProductUrl = "http://localhost:4000/api/products/getLatestPRoducts";
 
@@ -45,6 +47,7 @@ export const updateProductAsync = createAsyncThunk(
       console.log(response.data);
       return response.data;
     } catch (error) {
+      // console.log(error);
       toast.error(error.response.data.error);
     }
   }
@@ -69,6 +72,21 @@ export const getAllProductsAsync = createAsyncThunk(
   }
 );
 
+//GET SINGLEPRODUCT
+export const getsingleProductAsync = createAsyncThunk(
+  "Shop/getsingleproduct",
+  async (id) => {
+    try {
+      const response = await axios.post(getsingleProductUrl,{id});
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+);
+
+
 const productSlice = createSlice({
   name: "productSlice",
   initialState,
@@ -91,6 +109,14 @@ const productSlice = createSlice({
       .addCase(getAllProductsAsync.fulfilled, (state, action) => {
         state.isLoading = false;
         state.products = action.payload;
+      })
+
+      .addCase(getsingleProductAsync.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getsingleProductAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.singleProduct = action.payload;
       });
 
     // .addCase(deleteGoalsAsync.pending, (state, action) => {
@@ -105,11 +131,7 @@ const productSlice = createSlice({
     //     (product) => product._id !== action.payload.id
     //   );
     // })
-    // .addCase(deleteGoalsAsync.rejected, (state, action) => {
-    //   state.isLoading = false;
-    //   state.isError = true;
-    //   state.message = action.payload;
-    // })
+  
 
     // .addCase(updateProductAsync.pending, (state, action) => {
     //   state.updateLoading = true;

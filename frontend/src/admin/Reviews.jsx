@@ -103,7 +103,7 @@ const Reviews = () => {
                           reviews?.totalReviews &&
                           reviews?.ratings &&
                           reviews?.ratings[5] !== 0
-                            ? (reviews?.ratings[5] / totalReviews) * 100
+                            ? (reviews?.ratings[5] / reviews?.totalReviews) * 100
                             : 0
                         }%`,
                       }}

@@ -76,19 +76,13 @@ export const updateProduct = async (req, res, next) => {
     }
     if (price && price > 0) {
       updateQuery = { ...updateQuery, price };
-    } else {
-      throw new Error("price must be greater then 0");
     }
-    if (sale_price && sale_price > 0) {
+    if (sale_price && sale_price >= 0) {
       updateQuery = { ...updateQuery, sale_price };
-    } else {
-      throw new Error("sale_price must be greater then 0");
-    }
+    } 
     if (stock && stock > 0) {
       updateQuery = { ...updateQuery, stock };
-    } else {
-      throw new Error("stock value must be greater then 0");
-    }
+    } 
     if (category) {
       updateQuery = { ...updateQuery, category };
     }
@@ -110,12 +104,14 @@ export const updateProduct = async (req, res, next) => {
       if (imageData.downloadURL && product.image.downloadURL) {
         await deleteImageFromFirebase(product.image.downloadURL);
       }
-      updateQuery = { ...updateQuery, imageData };
+    }
+    if(imageData){
+      updateQuery = { ...updateQuery, image:imageData };
     }
     if (Object.keys(updateQuery).length === 0)
       throw new Error("No fileds Updated");
     await ProductsModel.findByIdAndUpdate({ _id: productId }, updateQuery);
-    return res.status(200).json({ message: "Product Updated" });
+    return res.status(200).json({ success:true , message: "Product Updated" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -150,39 +146,10 @@ export const getLatestPRoducts = async (req, res, next) => {
   }
 };
 
-// export const getProducts = async (req, res, next) => {
-//   try {
-//     let page = parseInt(req.query.page) || 1;
-//     let query = {};
-
-//     // if (req.query.category && req.query.category !== 'null') {
-//     //   query.category = req.query.category;
-//     // };
-    
-//     console.log("q",query);
-//     console.log("p",page);
-//     const limit = 5;
-//     const productData = await ProductsModel.find()
-//       .limit(limit)
-//       .skip((page - 1) * limit)
-//       .exec();
-
-//     const count = await ProductsModel.countDocuments();
-//     setMongoose();
-//     return res.status(200).json({
-//       productData,
-//       totalPages: Math.ceil(count / limit),
-//       currentPage: page,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({ error: error.message });
-//   }
-// };
-
 export const getProducts = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1; 
-    const limit = 5;
+    const limit = 15;
     let search = req.query.search || "";
     let category = req.query.category || "All";
 
@@ -196,7 +163,8 @@ export const getProducts = async (req, res, next) => {
    
     const productData = await ProductsModel.find(query)
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit)
+      .sort({createdAt:-1})
 
     const total = await ProductsModel.countDocuments(query);
 
@@ -210,6 +178,18 @@ export const getProducts = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: true, message: "Internal Server Error" });
+  }
+};
+
+export const getProductById = async (req, res, next) => {
+  try {
+    const { id } = req.body;
+    if (!id) throw new Error("Product Id Required");
+    const product = await ProductsModel.findById(id);
+    setMongoose();
+    return res.status(200).json(product);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
 

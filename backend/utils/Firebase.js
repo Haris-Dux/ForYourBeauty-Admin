@@ -2,7 +2,7 @@
 
 // firebaseFunctions.js
 import { initializeApp } from "firebase/app";
-import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
 import firebaseConfig from "../config/FirebaseConfig.js";
 
 initializeApp(firebaseConfig);
@@ -31,9 +31,9 @@ export const uploadImageToFirebase = async (file,folder) => {
 
 export const deleteImageFromFirebase = async (downloadURL) => {
     try {
-      const imageRef = ref(storage, downloadURL);
-      await deleteObject(imageRef);
-    } catch (error) {
-      throw error;
-    }
+        const imageRef = ref(storage, downloadURL);
+        await deleteObject(imageRef);
+      } catch (error) {
+        throw error;
+      }
   };

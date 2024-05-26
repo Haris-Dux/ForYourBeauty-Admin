@@ -205,19 +205,20 @@ const AllProducts = () => {
 
               {products?.productData?.length > 0 ? (
                 <>
-                  <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <ul  className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {products?.productData?.map((data) => (
-                      <li className="w-[300px] rounded-md border bg-gray-200">
+                      <li className="w-[300px]  rounded-md border bg-gray-200">
                         <img
+                         onClick={() => handleUpdate(data?.id)}
                           src={data?.image?.downloadURL}
                           alt="Laptop"
-                          className="h-[250px] w-full rounded-t-md object-cover"
+                          className="h-[250px] cursor-pointer w-full rounded-t-md object-cover"
                         />
                         <div className="p-4">
                           <h1 className="inline-flex items-center text-lg font-semibold">
                             {data?.name}
                           </h1>
-                          {data.sale_price ? (
+                          {data.sale_price > 0 ? (
                             <div className="flex items-center gap-x-2">
                               <h1 className="items-center text-lg font-semibold">
                                 Rs. {data?.sale_price}

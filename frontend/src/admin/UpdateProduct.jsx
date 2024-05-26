@@ -1,30 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  createProductAsync,
-  getAllProductsAsync,
+  getsingleProductAsync,
   updateProductAsync,
 } from "../features/productSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const UpdateProduct = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const categories = ["Skincare", "Body Care", "Haircare", "Cosmetics"];
 
-  const { products, isLoading } = useSelector((state) => state.product);
+  const { singleProduct, isLoading } = useSelector((state) => state.product);
 
-  // SELECTED PRODUCT
-  const selectedProduct = products?.productData?.filter(
-    (data) => data.id === id
-  );
-  console.log("selectedProduct", selectedProduct);
-
-  // useEffect(() => {
-  //   dispatch(getAllProductsAsync());
-  // }, [id]);
+  useEffect(() => {
+    dispatch(getsingleProductAsync(id));
+  }, [id]);
 
   const subCategories = {
     Skincare: ["Facewash", "Serums", "Moisturiser", "Toner"],
@@ -40,54 +32,53 @@ const UpdateProduct = () => {
     Cosmetics: [],
   };
 
-  const { createLoading } = useSelector((state) => state.product);
-
   const [formdata, setFormdata] = useState({
     name: "",
     price: "",
-    sale_price: "",
+    sale_price: 0,
     category: "",
     subCategory: "",
     quantity: "",
     description: "",
     file: null,
     latest: false,
+    productId: "",
   });
 
   useEffect(() => {
-    if (selectedProduct.length > 0) {
-      const productData = selectedProduct[0];
-
+    if (singleProduct) {
       setFormdata((prevFormData) => ({
         ...prevFormData,
-        name: productData?.name || "",
-        price: productData?.price || "",
-        sale_price: productData?.sale_price || "",
-        category: productData?.category || "",
-        subCategory: productData?.subCategory || "",
-        quantity: productData?.stock || "",
-        description: productData?.description || "",
-        file: {
-          ...prevFormData.file,
-          downloadURL: productData?.image.downloadURL || "",
-        },
-        latest: productData?.latest || false,
+        name: singleProduct?.name || "",
+        price: singleProduct?.price || "",
+        sale_price: singleProduct?.sale_price || 0,
+        category: singleProduct?.category || "",
+        subCategory: singleProduct?.subCategory || "",
+        quantity: singleProduct?.stock || "",
+        description: singleProduct?.description || "",
+        latest: singleProduct?.latest,
+        productId: singleProduct.id,
       }));
     }
-  }, []);
+  }, [singleProduct]);
 
-  // const handleChange = (e, field) => {
-  //   const value = e.target.value;
-  //   setFormdata((prevFormData) => ({ ...prevFormData, [field]: value }));
-  // };
+  const handleChange = (e, fieldName) => {
+    if (e.target.type === "file") {
+      setFormdata({
+        ...formdata,
+        [fieldName]: e.target.files[0],
+      });
+    } else {
+      setFormdata({
+        ...formdata,
+        [fieldName]: e.target.value,
+      });
+    }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setFormdata((prevFormData) => ({ ...prevFormData, file: file }));
-  };
-
-  const handleRemoveImage = () => {
-    setFormdata((prevFormData) => ({ ...prevFormData, file: null }));
   };
 
   const handleCategoryChange = (e) => {
@@ -104,20 +95,6 @@ const UpdateProduct = () => {
     setFormdata({ ...formdata, subCategory: selectedSubCategory });
   };
 
-  // const handleChange = (e, fieldName) => {
-  //   if (e.target.type === "file") {
-  //     setFormdata({
-  //       ...formdata,
-  //       [fieldName]: e.target.files[0],
-  //     });
-  //   } else {
-  //     setFormdata({
-  //       ...formdata,
-  //       [fieldName]: e.target.value,
-  //     });
-  //   }
-  // };
-
   const handleCheckChange = (event) => {
     const { name, type, checked } = event.target;
     const newValue = type === "checkbox" ? checked : event.target.value;
@@ -128,39 +105,74 @@ const UpdateProduct = () => {
     });
   };
 
+  const validateSubCategory = () => {
+    if (!formdata.category) return true;
+    if (formdata.category === "Cosmetics") return true;
+    const validSubCategories = subCategories[formdata.category];
+    return validSubCategories.includes(formdata.subCategory);
+  };
+
   // HANDLE SUBMIT
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const formData = new FormData();
+    if (!validateSubCategory()) {
+      toast.error("Invalid subcategory for the selected category.");
+      return;
+    }
 
-    // Check each field and append it to formData if it's updated
-    if (formdata.file) formData.append("filename", formdata.file);
-    if (formdata.name) formData.append("name", formdata.name);
-    if (formdata.price) formData.append("price", formdata.price);
-    if (formdata.sale_price) formData.append("sale_price", formdata.sale_price);
-    if (formdata.category) formData.append("category", formdata.category);
-    if (formdata.subCategory)
-      formData.append("subCategory", formdata.subCategory);
-    if (formdata.quantity) formData.append("stock", formdata.quantity);
-    if (formdata.description)
+    // Only append fields that have been updated
+    if (formdata.file && formdata.file !== singleProduct.image.downloadURL) {
+      formData.append("filename", formdata.file);
+    }
+    if (formdata.name !== singleProduct.name) {
+      formData.append("name", formdata.name);
+    }
+    if (formdata.price !== singleProduct.price) {
+      formData.append("price", formdata.price);
+    }
+    if (formdata.sale_price !== singleProduct.sale_price) {
+      formData.append("sale_price", formdata.sale_price);
+    }
+    if (formdata.category !== singleProduct.category) {
+      formData.append("category", formdata.category);
+    }
+    if (formdata.subCategory !== singleProduct.subCategory) {
+      if (formdata.category === "Cosmetics") {
+        formData.append("subCategory", "null");
+      } else {
+        formData.append("subCategory", formdata.subCategory);
+      }
+    }
+    if (formdata.quantity !== singleProduct.stock) {
+      formData.append("stock", formdata.quantity);
+    }
+    if (formdata.description !== singleProduct.description) {
       formData.append("description", formdata.description);
-    if (formdata.latest) formData.append("latest", formdata.latest);
+    }
+    if (formdata.latest !== singleProduct.latest) {
+      formData.append("latest", formdata.latest);
+    }
+    if (singleProduct) {
+      formData.append("productId", formdata.productId);
+    }
 
     try {
       dispatch(updateProductAsync(formData)).then((res) => {
-        if (res.payload.message) {
+        if (res.payload.success) {
           setFormdata({
             name: "",
             price: "",
-            sale_price: "",
+            sale_price: 0,
             category: "",
             subCategory: "",
             quantity: "",
             description: "",
             file: null,
             latest: false,
+            productId: "",
           });
+          dispatch(getsingleProductAsync(id));
         }
       });
     } catch (error) {
@@ -261,7 +273,6 @@ const UpdateProduct = () => {
                   onChange={(e) =>
                     setFormdata({ ...formdata, sale_price: e.target.value })
                   }
-                  required
                 />
               </div>
 
@@ -356,80 +367,69 @@ const UpdateProduct = () => {
               </div>
 
               {/* IMAGE */}
-              {formdata?.file?.downloadURL ? (
+              {singleProduct?.image && (
                 <div className="sm:col-span-2">
                   <div className="flex items-center justify-center w-full relative">
-                    <label
-                      className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600"
-                      htmlFor="dropzone-file"
-                    >
+                    <div className="flex flex-col py-2 items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg  bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                       <img
-                        src={formdata.file.downloadURL}
-                        alt="Selected"
+                       src={
+                        formdata.file
+                          ? URL.createObjectURL(formdata.file)
+                          : singleProduct?.image?.downloadURL
+                      }
+                        // src={singleProduct?.image?.downloadURL}
+                        alt="Product Image"
                         className="h-full"
-                        onClick={() => {
-                          const fileInput =
-                            document.getElementById("dropzone-file");
-                          if (fileInput) fileInput.click();
-                        }}
-                        style={{ cursor: "pointer" }}
                       />
-                    </label>
-                    <button
-                      className="absolute bottom-2 right-2 px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                      onClick={handleRemoveImage}
-                      type="button"
-                    >
-                      Remove Image
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="sm:col-span-2">
-                  <div className="flex items-center justify-center w-full">
-                    <label
-                      className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-                      htmlFor="dropzone-file"
-                    >
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg
-                          aria-hidden="true"
-                          className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                          fill="none"
-                          viewBox="0 0 20 16"
-                          xmlns="http://www.w3.org/2000/svg"
+                    </div>
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center justify-center w-full">
+                        <label
+                          className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                          htmlFor="dropzone-file"
                         >
-                          <path
-                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg
+                              aria-hidden="true"
+                              className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                              fill="none"
+                              viewBox="0 0 20 16"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                              />
+                            </svg>
+                            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                              <span className="font-semibold">
+                                Click to upload New Image
+                              </span>{" "}
+                            </p>
+                            <p className="text-xs px-5  text-gray-500 dark:text-gray-400">
+                              SVG, PNG, JPG or GIF (MAX. 800x400px)
+                            </p>
+                          </div>
+                          <input
+                            className="hidden"
+                            id="dropzone-file"
+                            type="file"
+                            onChange={(e) => handleChange(e, "file")}
                           />
-                        </svg>
-                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          <span className="font-semibold">Click to upload</span>{" "}
-                          or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          SVG, PNG, JPG or GIF (MAX. 800x400px)
-                        </p>
+                        </label>
                       </div>
-                      <input
-                        className="hidden"
-                        id="dropzone-file"
-                        type="file"
-                        onChange={(e) => handleChange(e, "file")}
-                      />
-                    </label>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {createLoading ? (
+            {isLoading ? (
               <button
-                disabled={createLoading}
+                disabled={isLoading}
                 type="button"
                 className={`w-36 flex cursor-not-allowed justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white bg-primary-300 rounded-lg`}
               >
