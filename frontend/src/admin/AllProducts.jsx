@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProductsAsync } from "../features/productSlice";
+import Loader from "react-loaders";
 
 const AllProducts = () => {
   const navigate = useNavigate();
@@ -28,8 +29,7 @@ const AllProducts = () => {
     };
   }, []);
 
-  const { products, isLoading } = useSelector((state) => state.product);
-
+  const { products , isLoading } = useSelector((state) => state.product);
   const [searchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page")) || 1;
   const category = searchParams.get("category") || "All";
@@ -87,8 +87,8 @@ const AllProducts = () => {
       <section>
         <div className="bg-[#E5E5E5] dark:bg-gray-900 mx-auto min-h-screen max-w-screen-xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
           {isLoading ? (
-            <div className="flex justify-center items-center py-10">
-              <div className="loader-pink"></div>
+            <div className="flex justify-center items-center min-h-screen">
+               <Loader type="ball-beat" active={true} />
             </div>
           ) : (
             <>
@@ -212,7 +212,7 @@ const AllProducts = () => {
                          onClick={() => handleUpdate(data?.id)}
                           src={data?.image?.downloadURL}
                           alt="Laptop"
-                          className="h-[250px] cursor-pointer w-full rounded-t-md object-cover"
+                          className="h-[250px] cursor-pointer w-full rounded-t-md object-contain"
                         />
                         <div className="p-4">
                           <h1 className="inline-flex items-center text-lg font-semibold">

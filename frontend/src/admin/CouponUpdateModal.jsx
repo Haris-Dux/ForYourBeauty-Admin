@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllCoupunAsync, updateCoupunAsync } from "../features/couponSlice";
 import { RxCross2 } from "react-icons/rx";
 import toast from "react-hot-toast";
+import Loader from "react-loaders";
 
 const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
   const dispatch = useDispatch();
@@ -37,11 +38,11 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
         isActive: coupon.isActive || false,
       });
     }
-  }, [updatedCouponId]);
+  }, [updatedCouponId,coupons]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
+    return isNaN(date) ? "" : date.toISOString().split("T")[0];
   };
 
   // HANDLE SUBMIT
@@ -149,7 +150,7 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
                     type="date"
                     name="expiresAt"
                     id="expiresAt"
-                    value={updateFormData.expiresAt}
+                    value={formatDate(updateFormData.expiresAt)}
                     onChange={(e) =>
                       setUpdateFormData({
                         ...updateFormData,
@@ -280,7 +281,7 @@ const CouponUpdateModal = ({ updatedCouponId, openModal, setOpenModal }) => {
 
               <div className="mt-8 flex items-center space-x-4">
                 {isLoading ? (
-                  <div className="loader-pink"></div>
+                  <Loader type="ball-beat" active={true} />
                 ) : (
                   <button
                     type="submit"

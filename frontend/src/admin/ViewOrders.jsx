@@ -2,6 +2,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { getAllOrdersAsync } from "../features/orderSlice";
 import { useDispatch, useSelector } from "react-redux";
+import Loader from "react-loaders";
 
 const ViewOrders = () => {
   const navigate = useNavigate();
@@ -112,7 +113,7 @@ const ViewOrders = () => {
 
           {loading ? (
         <div className="flex justify-center items-center min-h-screen">
-          <div className="loader-pink"></div>
+           <Loader type="ball-beat" active={true} />
         </div>
       ) : (
             

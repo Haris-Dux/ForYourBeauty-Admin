@@ -20,6 +20,8 @@ import Reviews from "./admin/Reviews";
 import ResetPassword from "./auth/ResetPassword";
 import ContactQueries from "./admin/ContactQueries";
 import QueryDisplay from "./admin/QueryDisplay";
+import "loaders.css/loaders.min.css";
+import "./Loader.scss";
 
 function App() {
   const dispatch = useDispatch();

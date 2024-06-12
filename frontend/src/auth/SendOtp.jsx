@@ -13,12 +13,6 @@ const SendOtp = () => {
 
   const { isLoading } = useSelector((state) => state.auth);
 
-  // useEffect(() => {
-  //   if (user && user?.login) {
-  //     navigate("/admin");
-  //   }
-  // }, []);
-
   // HANDLE SUBMIT
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -34,7 +28,7 @@ const SendOtp = () => {
     <>
       <section
         id="login"
-        className="bg-gradient-to-t from-[#fbc2eb] to-[#a6c1ee]"
+        className="bg-[#EC72AF]"
       >
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-[100vh] lg:py-0">
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 ">

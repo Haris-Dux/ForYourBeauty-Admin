@@ -19,11 +19,21 @@ export const addProduct = async (req, res, next) => {
     } = req.body;
     if (!name || !description || !price || !stock || !category)
       throw new Error("Please provide all required fields");
-    if (price <= 0 && stock <= 0) {
-      throw new Error("Value must be greater then 0");
+    if (parseFloat(price) <= 0) {
+      throw new Error("Price must be greater than 0");
     }
-    if (sale_price && sale_price <= 0) {
-      throw new Error("Value must be greater then 0");
+    if (parseFloat(stock) <= 0) {
+      throw new Error("Stock must be greater than 0");
+    }
+
+    if (parseFloat(sale_price) && parseFloat(sale_price) < 0) {
+      throw new Error("Sale price must be 0 or greater");
+    }
+    if (parseFloat(sale_price) >= parseFloat(price)) {
+      throw new Error("Sale price must be less than the original price");
+    }
+    if (parseFloat(sale_price) <= 0 && parseFloat(price) <= 0) {
+      throw new Error("Both Sale price and Price cannot be 0");
     }
     const file = req.file;
     if (!file) throw new Error("Please provide a file");
@@ -67,6 +77,22 @@ export const updateProduct = async (req, res, next) => {
     if (!product) {
       throw new Error("Product not found");
     }
+    if (parseFloat(price) <= 0) {
+      throw new Error("Price must be greater than 0");
+    }
+    if (parseFloat(stock) <= 0) {
+      throw new Error("Stock must be greater than 0");
+    }
+
+    if (parseFloat(sale_price) && parseFloat(sale_price) < 0) {
+      throw new Error("Sale price must be 0 or greater");
+    }
+    if (parseFloat(sale_price) >= parseFloat(product.price)) {
+      throw new Error("Sale price must be less than the original price");
+    }
+    if (parseFloat(sale_price) <= 0 && parseFloat(price) <= 0) {
+      throw new Error("Both Sale price and Price cannot be 0");
+    }
     let updateQuery = {};
     if (name) {
       updateQuery = { ...updateQuery, name };
@@ -74,13 +100,13 @@ export const updateProduct = async (req, res, next) => {
     if (description) {
       updateQuery = { ...updateQuery, description };
     }
-    if (price && price > 0) {
+    if (price) {
       updateQuery = { ...updateQuery, price };
     }
-    if (sale_price && sale_price >= 0) {
+    if (sale_price) {
       updateQuery = { ...updateQuery, sale_price };
     } 
-    if (stock && stock > 0) {
+    if (stock) {
       updateQuery = { ...updateQuery, stock };
     } 
     if (category) {
@@ -173,7 +199,7 @@ export const getProducts = async (req, res, next) => {
       page,
       productData,
     };
-
+    setMongoose()
     res.status(200).json(response);
   } catch (err) {
     console.log(err);

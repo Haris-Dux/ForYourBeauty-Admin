@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MdOutlineDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { getAllQueriesAsync } from "../features/contactSlice";
+import Loader from "react-loaders";
 
 const ContactQueries = () => {
   const dispatch = useDispatch();
@@ -38,9 +39,9 @@ const ContactQueries = () => {
 
             {/* ----------- TABLE ----------- */}
             {isLoading ? (
-              <div className="flex justify-center items-center py-10">
-                <div className="loader-pink"></div>
-              </div>
+               <div className="flex justify-center items-center min-h-screen">
+               <Loader type="ball-beat" active={true} />
+             </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-md text-left text-gray-500 dark:text-gray-100">

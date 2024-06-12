@@ -6,6 +6,7 @@ import {
   getAllReviewsAsync,
 } from "../features/reviewSlice";
 import { FaStar } from "react-icons/fa";
+import Loader from "react-loaders";
 
 const StarRating = ({ rating }) => {
   const stars = [];
@@ -62,8 +63,8 @@ const Reviews = () => {
     <>
       <section className="bg-[#E5E5E5] dark:bg-gray-900 py-8 sm:py-10 mx-auto min-h-screen max-w-screen-xl px-4 lg:px-8">
         <div className="bg-white py-8 antialiased dark:bg-gray-800 md:py-16 rounded-lg">
-          {isLoading ?    <div className="flex justify-center items-center py-10">
-          <div className="loader-pink"></div>
+          {isLoading ?    <div className="flex justify-center items-center min-h-screen">
+            <Loader type="ball-beat" active={true} />
         </div> : <div className="mx-auto px-6 2xl:px-6  ">
             {/* HEADER SECTION */}
             <div className="flex items-center gap-2">

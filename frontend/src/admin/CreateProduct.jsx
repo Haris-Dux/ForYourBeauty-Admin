@@ -1,12 +1,10 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { createProductAsync } from "../features/productSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import Loader from "react-loaders";
 
 const CreateProduct = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const categories = ["Skincare", "Body Care", "Haircare", "Cosmetics"];
 
   const subCategories = {
@@ -24,7 +22,7 @@ const CreateProduct = () => {
   };
 
   const { createLoading } = useSelector((state) => state.product);
-
+  
   const [formdata, setFormdata] = useState({
     name: "",
     price: "",
@@ -366,23 +364,14 @@ const CreateProduct = () => {
               <button
               disabled={createLoading}
                 type="button"
-                className= {`w-36 flex cursor-not-allowed justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center text-white bg-primary-300 rounded-lg`} 
+                className= {`w-36 flex cursor-not-allowed justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-cente`} 
               >
-                <svg
-                  width="20"
-                  height="20"
-                  fill="currentColor"
-                  className="mr-2 animate-spin"
-                  viewBox="0 0 1792 1792"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M526 1394q0 53-37.5 90.5t-90.5 37.5q-52 0-90-38t-38-90q0-53 37.5-90.5t90.5-37.5 90.5 37.5 37.5 90.5zm498 206q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-704-704q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm1202 498q0 52-38 90t-90 38q-53 0-90.5-37.5t-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-964-996q0 66-47 113t-113 47-113-47-47-113 47-113 113-47 113 47 47 113zm1170 498q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-640-704q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm530 206q0 93-66 158.5t-158 65.5q-93 0-158.5-65.5t-65.5-158.5q0-92 65.5-158t158.5-66q92 0 158 66t66 158z"></path>
-                </svg>
+                <Loader type="ball-beat" active={true} />
               </button>
             ) : (
               <button
                 type="submit"
-                className="w-36 flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-6 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800"
+                className="w-36 flex justify-center items-center px-5 py-2.5 mt-2 sm:mt-6 text-sm font-medium text-center text-white bg-[#EC72AF] hover:bg-[#b4487e]"
               >
                 Add product
               </button>
